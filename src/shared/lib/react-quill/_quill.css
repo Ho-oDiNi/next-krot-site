@@ -1,0 +1,33 @@
+.ql-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  ul,
+  ol {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  li {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  a {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: oklch(54.6% 0.245 262.881);
+    &:hover {
+      @media (hover: hover) {
+        opacity: 70%;
+      }
+    }
+  }
+}

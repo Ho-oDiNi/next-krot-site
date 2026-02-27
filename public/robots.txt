@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /documents
+Disallow: /_not-found
+Disallow: /api
+Disallow: /privacy
+
+Host: alpforce.ru
+Sitemap: https://alpforce.ru/sitemap.xml
+Clean-Param: _ym_debug /

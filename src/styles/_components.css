@@ -1,0 +1,58 @@
+@layer components {
+  .text-main {
+    @apply 2xs:text-base text-sm lg:text-lg;
+  }
+
+  .text-content {
+    @apply 2xs:text-base text-sm;
+  }
+
+  .text-h1 {
+    @apply xs:text-3xl mb-8 text-2xl font-bold md:text-4xl lg:text-5xl;
+  }
+
+  .text-h2 {
+    @apply xs:text-2xl mb-6 text-xl font-bold md:text-3xl lg:text-4xl;
+  }
+
+  .text-h3 {
+    @apply 2xs:text-lg xs:text-xl text-base font-bold;
+  }
+
+  .text-h3__desc {
+    @apply 2xs:text-base text-sm;
+  }
+
+  .service__main-content,
+  .service__datalist-content {
+    p,
+    a,
+    li {
+      @apply text-base;
+    }
+    a {
+      @apply text-blue-600 hover:opacity-70;
+    }
+    ol:has(li[data-list="ordered"]) {
+      @apply list-decimal pl-4;
+    }
+    ol:has(li[data-list="bullet"]) {
+      @apply list-disc pl-4;
+    }
+    li + li {
+      @apply mt-1;
+    }
+  }
+
+  img,
+  a {
+    @apply drag-none;
+  }
+
+  details summary:after {
+    @apply content-[url("/icons/plus-blue-light.svg")];
+  }
+  details[open] summary:after {
+    @apply content-[url("/icons/minus-blue-light.svg")];
+  }
+}

@@ -1,0 +1,38 @@
+@reference "tailwindcss";
+@reference "#styles/_theme.css";
+
+.wrapper {
+  @apply relative text-center;
+}
+
+@media (min-width: 768px) {
+  .wrapper {
+    @apply rounded-t-2xl p-4;
+  }
+
+  .wrapper::before,
+  .wrapper::after {
+    content: "";
+    @apply absolute h-4 w-4;
+  }
+
+  .roundedRight::after {
+    @apply md:bg-[image:theme(--radial-right)] bottom-0 left-full;
+  }
+
+  .roundedLeft::before {
+    @apply md:bg-[image:theme(--radial-left)] right-full bottom-0;
+  }
+
+  .coverLeft::before {
+    @apply top-full left-0 bg-slate-200;
+  }
+
+  .coverRight::after {
+    @apply top-full right-0 bg-slate-200;
+  }
+
+  .active {
+    @apply bg-slate-200;
+  }
+}

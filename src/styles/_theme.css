@@ -1,0 +1,24 @@
+@theme {
+  --space-inside-x: calc(var(--spacing) * 4);
+  --space-inside-y: calc(var(--spacing) * 16);
+
+  --breakpoint-xs: 26.5625rem;
+  --breakpoint-2xs: 23.4375rem;
+
+  --radial-right: radial-gradient(
+    circle at 100% 0,
+    transparent 15px,
+    #e2e8f0 16px
+  );
+  --radial-left: radial-gradient(circle at 0 0, transparent 15px, #e2e8f0 16px);
+
+  --animate-slide: slide 800ms linear infinite;
+  @keyframes slide {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(250%);
+    }
+  }
+}

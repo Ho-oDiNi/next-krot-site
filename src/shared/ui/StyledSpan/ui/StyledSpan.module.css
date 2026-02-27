@@ -1,0 +1,33 @@
+@reference "tailwindcss";
+@reference "#styles/_theme.css";
+@reference "#styles/_utility.css";
+
+.base {
+  @apply flex-center text-sm;
+}
+
+.size-sm {
+  @apply inline-block! rounded-lg px-4 py-2 text-center;
+}
+.size-md {
+  @apply 2xs:text-base h-10 w-55 rounded-xl lg:text-lg;
+}
+.size-lg {
+  @apply 2xs:text-base h-12 w-full max-w-70 rounded-xl lg:text-lg xl:text-xl;
+}
+.size-max {
+  @apply 2xs:text-base h-12 w-full rounded-xl lg:text-lg xl:text-xl;
+}
+
+.variant-primary {
+  @apply bg-red-500 font-bold text-white xl:text-xl;
+}
+.variant-secondary {
+  @apply bg-blue-500 text-white;
+}
+.variant-accent {
+  @apply bg-white text-red-500;
+}
+.variant-service-selected {
+  @apply bg-blue-500 text-white md:bg-white md:text-neutral-900;
+}

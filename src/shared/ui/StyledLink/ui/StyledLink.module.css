@@ -1,0 +1,39 @@
+@reference "tailwindcss";
+@reference "#styles/_theme.css";
+@reference "#styles/_utility.css";
+
+.base {
+  @apply flex-center cursor-pointer text-sm;
+}
+
+.size-sm {
+  @apply inline-block! rounded-lg px-4 py-2 text-center;
+}
+.size-md {
+  @apply 2xs:text-base h-10 w-55 rounded-xl lg:text-lg;
+}
+.size-lg {
+  @apply 2xs:text-base h-12 w-full max-w-70 rounded-xl lg:text-lg xl:text-xl;
+}
+.size-max {
+  @apply 2xs:text-base h-12 w-full rounded-xl lg:text-lg xl:text-xl;
+}
+
+.variant-primary {
+  @apply bg-red-500 font-bold text-white hover:bg-red-600 active:bg-red-400 xl:text-xl;
+}
+.variant-secondary {
+  @apply bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-400;
+}
+.variant-whatsapp {
+  @apply bg-slate-200 text-blue-500 hover:bg-slate-300;
+}
+.variant-dark {
+  @apply bg-blue-900 text-white hover:bg-blue-950 active:bg-blue-800;
+}
+.variant-white {
+  @apply bg-white text-neutral-900 hover:bg-blue-600 hover:text-white active:bg-blue-400;
+}
+.variant-service-possible {
+  @apply bg-slate-200 text-neutral-900 hover:bg-slate-300 active:bg-slate-300 md:bg-blue-500 md:text-white md:hover:bg-blue-600 md:active:bg-blue-400;
+}
