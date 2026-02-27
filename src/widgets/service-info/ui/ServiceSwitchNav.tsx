@@ -38,7 +38,7 @@ const ServiceSwitchNav = ({
                     isLast={index === services.length - 1}
                     isActive={currentServiceSlug === service.slug}
                 >
-                    {service.shortName || service.title}
+                    {service.title}
                 </ServiceSwitchLinkWrapper>
             ))}
         </nav>

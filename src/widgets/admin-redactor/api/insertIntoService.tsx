@@ -6,10 +6,7 @@ import { Service } from "@/entities/service";
 import { logger } from "@/shared/lib/logger";
 import prisma from "@/shared/lib/prisma";
 
-import {
-    normalizeServicePayload,
-    ServiceActionInput,
-} from "../servicePayload.utils";
+import { normalizeServicePayload } from "../servicePayload.utils";
 import { revalidateServicePaths } from "../serviceRevalidate.utils";
 import { isAdminServerSide } from "@/core/auth";
 
@@ -21,16 +18,10 @@ export async function insertIntoService(serviceData: Service): Promise<{
         const isAdmin = await isAdminServerSide();
         if (!isAdmin) throw new Error("Ошибка авторизации");
 
-        if (!Number.isInteger(serviceData.id) || serviceData.id <= 0) {
-            throw new Error("Идентификатор услуги обязателен");
-        }
-
-        const extendedPayload = serviceData as ServiceActionInput;
-        const { data, children, comparison } =
-            normalizeServicePayload(extendedPayload);
+        const { data } = normalizeServicePayload(serviceData);
 
         const existingService = await prisma.service.findUnique({
-            where: { id: serviceData.id },
+            where: { slug: serviceData.slug },
             include: {
                 category: {
                     select: {
@@ -44,107 +35,16 @@ export async function insertIntoService(serviceData: Service): Promise<{
             throw new Error("Услуга не найдена");
         }
 
-        let nextCategoryId: number | null =
-            extendedPayload.categoryId ?? existingService.categoryId;
-
-        if (!nextCategoryId && extendedPayload.categorySlug) {
-            const category = await prisma.category.findUnique({
-                where: { slug: extendedPayload.categorySlug },
-                select: { id: true },
-            });
-
-            nextCategoryId = category?.id ?? null;
-        }
-
-        if (!nextCategoryId) {
-            throw new Error("Категория обязательна");
-        }
-
-        const serviceId = existingService.id;
-
-        const updatedService = await prisma.$transaction(async (tx) => {
-            const updated = await tx.service.update({
-                where: { id: serviceId },
-                data: {
-                    ...data,
-                    categoryId: nextCategoryId,
-                },
-                include: {
-                    category: {
-                        select: {
-                            slug: true,
-                        },
+        const updatedService = await prisma.service.update({
+            where: { id: existingService.id },
+            data,
+            include: {
+                category: {
+                    select: {
+                        slug: true,
                     },
                 },
-            });
-
-            await tx.serviceChecklistItem.deleteMany({
-                where: { serviceId },
-            });
-
-            await tx.serviceMaterial.deleteMany({
-                where: { serviceId },
-            });
-
-            await tx.serviceFaq.deleteMany({
-                where: { serviceId },
-            });
-
-            if (children.whatIncluded.length > 0) {
-                await tx.serviceChecklistItem.createMany({
-                    data: children.whatIncluded.map(({ text, position }) => ({
-                        serviceId,
-                        text,
-                        position,
-                    })),
-                });
-            }
-
-            if (children.materials.length > 0) {
-                await tx.serviceMaterial.createMany({
-                    data: children.materials.map(({ text, position }) => ({
-                        serviceId,
-                        text,
-                        position,
-                    })),
-                });
-            }
-
-            if (children.faqs.length > 0) {
-                await tx.serviceFaq.createMany({
-                    data: children.faqs.map(
-                        ({ question, answer, position }) => ({
-                            serviceId,
-                            question,
-                            answer,
-                            position,
-                        }),
-                    ),
-                });
-            }
-
-            if (comparison) {
-                const normalizedComparison = {
-                    ...comparison,
-                    beforeImageAlt: comparison.beforeImageAlt ?? "",
-                    afterImageAlt: comparison.afterImageAlt ?? "",
-                };
-
-                await tx.serviceComparison.upsert({
-                    where: { serviceId },
-                    create: {
-                        serviceId,
-                        ...normalizedComparison,
-                    },
-                    update: normalizedComparison,
-                });
-            } else {
-                await tx.serviceComparison.deleteMany({
-                    where: { serviceId },
-                });
-            }
-
-            return updated;
+            },
         });
 
         await revalidateServicePaths([

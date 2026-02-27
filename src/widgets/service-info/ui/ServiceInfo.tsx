@@ -1,5 +1,4 @@
 import ServiceContent from "./ServiceContent";
-import ServiceSwitchNav from "./ServiceSwitchNav";
 import { Category } from "@/entities/category";
 import { Service } from "@/entities/service";
 
@@ -9,11 +8,7 @@ interface ServiceSectionProps {
     categoryServices?: Service[];
 }
 
-const ServiceInfo = ({
-    service,
-    category,
-    categoryServices = [],
-}: ServiceSectionProps) => {
+const ServiceInfo = ({ service }: ServiceSectionProps) => {
     return (
         <div className="container mx-auto min-h-150 px-(--space-inside-x) py-6">
             <article className="service h-full rounded-2xl bg-slate-200 p-8">

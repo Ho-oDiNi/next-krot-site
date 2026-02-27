@@ -36,77 +36,6 @@ export const useAdminRedactorFormHandlers = ({
         [setFormData],
     );
 
-    const handleArrayChange = useCallback(
-        (field: "whatIncluded" | "materials", index: number, value: string) => {
-            setFormData((prev) => {
-                const updated = [...prev[field]] as string[];
-                updated[index] = value;
-
-                return {
-                    ...prev,
-                    [field]: updated,
-                };
-            });
-        },
-        [setFormData],
-    );
-
-    const handleFaqChange = useCallback(
-        (index: number, type: 0 | 1, value: string) => {
-            setFormData((prev) => {
-                const updatedFaq = [...prev.faqItems];
-                const currentItem = updatedFaq[index] ?? ["", ""];
-                updatedFaq[index] = [
-                    type === 0 ? value : currentItem[0],
-                    type === 1 ? value : currentItem[1],
-                ];
-
-                return {
-                    ...prev,
-                    faqItems: updatedFaq,
-                };
-            });
-        },
-        [setFormData],
-    );
-
-    const addArrayItem = useCallback(
-        (field: "whatIncluded" | "materials") => {
-            setFormData((prev) => ({
-                ...prev,
-                [field]: [...prev[field], ""],
-            }));
-        },
-        [setFormData],
-    );
-
-    const removeArrayItem = useCallback(
-        (field: "whatIncluded" | "materials", index: number) => {
-            setFormData((prev) => ({
-                ...prev,
-                [field]: prev[field].filter((_, i) => i !== index),
-            }));
-        },
-        [setFormData],
-    );
-
-    const addFaqItem = useCallback(() => {
-        setFormData((prev) => ({
-            ...prev,
-            faqItems: [...prev.faqItems, ["", ""]],
-        }));
-    }, [setFormData]);
-
-    const removeFaqItem = useCallback(
-        (index: number) => {
-            setFormData((prev) => ({
-                ...prev,
-                faqItems: prev.faqItems.filter((_, i) => i !== index),
-            }));
-        },
-        [setFormData],
-    );
-
     const handleSubmit = useCallback(async () => {
         setIsSubmitting(true);
         setSubmitStatus(null);
@@ -130,12 +59,6 @@ export const useAdminRedactorFormHandlers = ({
 
     return {
         handleChange,
-        handleArrayChange,
-        handleFaqChange,
-        addArrayItem,
-        removeArrayItem,
-        addFaqItem,
-        removeFaqItem,
         handleSubmit,
     } as const;
 };

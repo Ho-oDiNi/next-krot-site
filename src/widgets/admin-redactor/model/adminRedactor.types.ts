@@ -1,15 +1,7 @@
 import { Category } from "@/entities/category";
 import { Service } from "@/entities/service";
 
-export type ViewMode =
-    | "menu"
-    | "meta"
-    | "content"
-    | "whatIncluded"
-    | "faq"
-    | "category"
-    | "categoryCreate"
-    | "delete";
+export type ViewMode = "menu" | "meta" | "content" | "delete";
 
 export type DeleteActionState = {
     success: boolean;
@@ -20,52 +12,15 @@ export interface ViewRendererProps {
     currentView: ViewMode;
     formData: Service;
     onViewChange: (view: ViewMode) => void;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onChange: (field: keyof Service, value: any) => void;
-    onArrayChange: (
-        field: "whatIncluded" | "materials",
-        index: number,
-        value: string,
-    ) => void;
-    onFaqChange: (index: number, type: 0 | 1, value: string) => void;
-    onAddArrayItem: (field: "whatIncluded" | "materials") => void;
-    onRemoveArrayItem: (
-        field: "whatIncluded" | "materials",
-        index: number,
-    ) => void;
-    onAddFaqItem: () => void;
-    onRemoveFaqItem: (index: number) => void;
+    onChange: (field: keyof Service, value: Service[keyof Service]) => void;
     isPending: boolean;
     deleteProps?: DeleteViewProps;
-    categoryViewProps?: Omit<CategoryViewComponentProps, "onBack">;
-    categoryCreateViewProps?: Omit<CategoryCreateViewComponentProps, "onBack">;
 }
 
 export interface BaseViewProps {
     formData: Service;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onChange: (field: keyof Service, value: any) => void;
+    onChange: (field: keyof Service, value: Service[keyof Service]) => void;
     onBack: () => void;
-}
-
-export interface ArrayViewProps extends BaseViewProps {
-    onArrayChange: (
-        field: "whatIncluded" | "materials",
-        index: number,
-        value: string,
-    ) => void;
-    onAddArrayItem: (field: "whatIncluded" | "materials") => void;
-    onRemoveArrayItem: (
-        field: "whatIncluded" | "materials",
-        index: number,
-    ) => void;
-}
-
-export interface FaqViewProps extends BaseViewProps {
-    onFaqChange: (index: number, type: 0 | 1, value: string) => void;
-    onAddFaqItem: () => void;
-    onRemoveFaqItem: (index: number) => void;
 }
 
 export interface DeleteViewProps {

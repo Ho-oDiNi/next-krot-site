@@ -3,87 +3,35 @@ import { cache } from "react";
 
 import prisma from "@/shared/lib/prisma";
 import { Service, ServiceWithCategory } from "../model";
-import { ComparisonImageSet } from "@/features/comparison-card";
 import { categoryWithServicesInclude, mapCategory } from "@/entities/category";
 
-const serviceDetailsInclude = {
-    whatIncluded: {
-        orderBy: {
-            position: "asc" as const,
-        },
-    },
-    materials: {
-        orderBy: {
-            position: "asc" as const,
-        },
-    },
-    faqs: {
-        orderBy: {
-            position: "asc" as const,
-        },
-    },
-    comparison: true,
-} satisfies Prisma.ServiceInclude;
-
 const serviceWithCategoryInclude = {
-    ...serviceDetailsInclude,
     category: {
         include: categoryWithServicesInclude,
     },
 } satisfies Prisma.ServiceInclude;
 
-type ServiceWithCategoryModel = Prisma.ServiceGetPayload<{
-    include: typeof serviceWithCategoryInclude;
-}>;
 
 type ServiceModel = Prisma.ServiceGetPayload<{
-    include: typeof serviceDetailsInclude;
+    include: {
+        category: {
+            select: {
+                slug: true;
+            };
+        };
+    };
 }>;
 
-const mapComparison = (
-    comparison: ServiceModel["comparison"],
-): ComparisonImageSet | undefined => {
-    if (!comparison) {
-        return undefined;
-    }
-
-    return {
-        beforeImage: comparison.beforeImageUrl,
-        beforeImageAlt: comparison.beforeImageAlt ?? undefined,
-        afterImage: comparison.afterImageUrl,
-        afterImageAlt: comparison.afterImageAlt ?? undefined,
-    } satisfies ComparisonImageSet;
-};
-
 const mapService = (service: ServiceModel): Service => {
-    const withCategory = service as Partial<ServiceWithCategoryModel>;
-
     return {
-        id: service.id,
         slug: service.slug,
-        shortName: service.shortName ?? undefined,
         metaTitle: service.metaTitle,
         metaDescription: service.metaDescription,
         title: service.title,
         description: service.description,
-        contentTitle: service.contentTitle ?? undefined,
-        contentDescription: service.contentDescription ?? undefined,
         mainText: service.mainText,
         guarantee: service.guarantee,
         duration: service.duration,
-        price: service.price,
-        priceAbbr: service.priceAbbr,
-        priceExplanation: service.priceExplanation ?? undefined,
-        faqDescription: service.faqDescription ?? "",
-        faqItems: service.faqs.map(({ question, answer }) => [
-            question,
-            answer,
-        ]),
-        whatIncluded: service.whatIncluded.map((item) => item.text),
-        materials: service.materials.map((item) => item.text),
-        comparedImages: mapComparison(service.comparison),
-        categoryId: service.categoryId,
-        categorySlug: withCategory.category?.slug,
     } satisfies Service;
 };
 
@@ -95,7 +43,13 @@ export const getServiceBySlug = cache(
 
         const service = await prisma.service.findUnique({
             where: { slug },
-            include: serviceWithCategoryInclude,
+            include: {
+                category: {
+                    select: {
+                        slug: true,
+                    },
+                },
+            },
         });
 
         if (!service) {
@@ -117,7 +71,13 @@ export const getServicesByCategory = cache(
             orderBy: {
                 id: "asc",
             },
-            include: serviceDetailsInclude,
+            include: {
+                category: {
+                    select: {
+                        slug: true,
+                    },
+                },
+            },
         });
 
         return services.map(mapService);

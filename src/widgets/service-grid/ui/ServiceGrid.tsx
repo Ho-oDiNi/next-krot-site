@@ -13,13 +13,10 @@ const ServiceGrid = async ({ limit }: ServiceGridProps) => {
             {servicesWithCategories.map(({ service, category }) => {
                 return (
                     <ServiceCard
-                        key={service.id}
+                        key={service.slug}
                         title={service.title}
                         description={service.description}
                         link={`/services/${category.slug}/${service.slug}`}
-                        price={service.price}
-                        priceAbbr={service.priceAbbr}
-                        priceExplanation={service.priceExplanation}
                     />
                 );
             })}

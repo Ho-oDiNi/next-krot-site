@@ -4,9 +4,6 @@ interface ServiceCardProps {
     title: string;
     description: string;
     link: string;
-    price: number;
-    priceAbbr: string;
-    priceExplanation?: string;
 }
 
 const ServiceCard = ({ title, description, link }: ServiceCardProps) => {
