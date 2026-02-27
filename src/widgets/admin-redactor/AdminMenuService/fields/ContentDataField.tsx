@@ -2,19 +2,12 @@ import QuillEditor from "@/shared/lib/react-quill";
 import InputField from "../ui/InputField";
 import { Service } from "@/entities/service";
 import TextareaField from "../ui/TextareaField";
-import PriceAbbreviationField from "./PriceAbbreviationField";
 
 interface ContentDataFieldProps {
     formData: {
         title: string;
-        shortName: string;
         description: string;
-        contentTitle: string;
-        contentDescription: string;
         mainText: string;
-        price: number;
-        priceAbbr: string;
-        priceExplanation: string;
         guarantee: string;
         duration: string;
     };
@@ -47,6 +40,22 @@ const ContentDataField = ({ formData, onChange }: ContentDataFieldProps) => {
                 value={formData.mainText}
                 onChange={(value) => onChange("mainText", value)}
                 className="rounded border"
+            />
+
+            <InputField
+                label="Гарантия"
+                type="text"
+                value={formData.guarantee}
+                onChange={(value) => onChange("guarantee", value)}
+                required
+            />
+
+            <InputField
+                label="Срок выполнения"
+                type="text"
+                value={formData.duration}
+                onChange={(value) => onChange("duration", value)}
+                required
             />
         </div>
     );

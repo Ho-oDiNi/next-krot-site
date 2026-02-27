@@ -24,14 +24,10 @@ const SearchBar = ({ services }: SearchBarProps) => {
 
         return services.filter(({ service, category }) => {
             const normalizedTitle = normalizeSearchText(service.title);
-            const normalizedShortName = normalizeSearchText(
-                service.shortName ?? "",
-            );
             const normalizedCategory = normalizeSearchText(category.name);
 
             return (
                 normalizedTitle.includes(normalizedSearch) ||
-                normalizedShortName.includes(normalizedSearch) ||
                 normalizedCategory.includes(normalizedSearch)
             );
         });

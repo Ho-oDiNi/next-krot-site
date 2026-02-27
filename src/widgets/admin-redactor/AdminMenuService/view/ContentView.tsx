@@ -7,17 +7,11 @@ const ContentView = ({ formData, onChange, onBack }: BaseViewProps) => (
         <BackButton onBack={onBack} />
         <ContentDataField
             formData={{
-                title: formData.title as string,
-                shortName: formData.shortName as string,
-                description: formData.description as string,
-                contentTitle: formData.contentTitle as string,
-                contentDescription: formData.contentDescription as string,
-                mainText: formData.mainText as string,
-                price: formData.price,
-                priceAbbr: formData.priceAbbr,
-                priceExplanation: formData.priceExplanation as string,
-                guarantee: formData.guarantee as string,
-                duration: formData.duration as string,
+                title: formData.title,
+                description: formData.description,
+                mainText: formData.mainText,
+                guarantee: formData.guarantee,
+                duration: formData.duration,
             }}
             onChange={onChange}
         />

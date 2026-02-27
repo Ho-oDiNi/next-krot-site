@@ -12,10 +12,7 @@ export default function ServiceContent({ service }: ServiceContentProps) {
     return (
         <div className="grid gap-8 md:gap-14">
             <section className="flex flex-col gap-8 md:gap-15">
-                <ServiceHeader
-                    title={service.contentTitle ?? service.title}
-                    description={service.contentDescription}
-                />
+                <ServiceHeader title={service.title} description={service.description} />
 
                 <div className="service__main-content flex flex-col gap-4">
                     <ParsedHTML html={service.mainText} />

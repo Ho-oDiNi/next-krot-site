@@ -12,13 +12,11 @@ import {
     getServiceTitle,
 } from "@/widgets/admin-redactor/admin.utils";
 import { useAdminRedactorFormHandlers } from "./useFormHandlers";
-import { useCategoryHandlers } from "./useCategoryHandlers";
 import {
     AdminRedactorFormProps,
     ViewMode,
     DeleteActionState,
 } from "@/widgets/admin-redactor/model/adminRedactor.types";
-import { Category } from "@/entities/category";
 import { Service } from "@/entities/service";
 
 const AdminRedactorForm = ({ mode, onClose }: AdminRedactorFormProps) => {
@@ -35,26 +33,10 @@ const AdminRedactorForm = ({ mode, onClose }: AdminRedactorFormProps) => {
         message: string;
     } | null>(null);
     const [isServiceLoading, setIsServiceLoading] = useState(false);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
-    const [categoriesError, setCategoriesError] = useState<string | null>(null);
     const [deleteState, deleteAction] = useActionState<
         DeleteActionState,
         FormData
     >(deleteService, null);
-
-    const {
-        loadCategories,
-        handleCreateCategory,
-        handleUpdateCategory,
-        handleDeleteCategory,
-    } = useCategoryHandlers({
-        setIsCategoriesLoading,
-        setCategoriesError,
-        setCategories,
-        setFormData,
-        setCurrentView,
-    });
 
     useEffect(() => {
         let isActive = true;
@@ -97,20 +79,7 @@ const AdminRedactorForm = ({ mode, onClose }: AdminRedactorFormProps) => {
         };
     }, [mode, serviceSlug]);
 
-    useEffect(() => {
-        loadCategories();
-    }, [loadCategories]);
-
-    const {
-        handleChange,
-        handleArrayChange,
-        handleFaqChange,
-        addArrayItem,
-        removeArrayItem,
-        addFaqItem,
-        removeFaqItem,
-        handleSubmit,
-    } = useAdminRedactorFormHandlers({
+    const { handleChange, handleSubmit } = useAdminRedactorFormHandlers({
         mode,
         formData,
         setFormData,
@@ -137,12 +106,6 @@ const AdminRedactorForm = ({ mode, onClose }: AdminRedactorFormProps) => {
                     onChange={(field, value) =>
                         handleChange(field as keyof Service, value)
                     }
-                    onArrayChange={handleArrayChange}
-                    onFaqChange={handleFaqChange}
-                    onAddArrayItem={addArrayItem}
-                    onRemoveArrayItem={removeArrayItem}
-                    onAddFaqItem={addFaqItem}
-                    onRemoveFaqItem={removeFaqItem}
                     isPending={isSubmitting || isServiceLoading}
                     deleteProps={
                         mode === "delete"
@@ -154,22 +117,6 @@ const AdminRedactorForm = ({ mode, onClose }: AdminRedactorFormProps) => {
                               }
                             : undefined
                     }
-                    categoryViewProps={{
-                        formData,
-                        onChange: (field, value) =>
-                            handleChange(field as keyof Service, value),
-                        categories,
-                        isLoading: isCategoriesLoading,
-                        error: categoriesError,
-                        onRefresh: loadCategories,
-                        onCreateCategory: () =>
-                            setCurrentView("categoryCreate"),
-                        onEditCategory: handleUpdateCategory,
-                        onDeleteCategory: handleDeleteCategory,
-                    }}
-                    categoryCreateViewProps={{
-                        onSubmit: handleCreateCategory,
-                    }}
                 />
             </Form>
         </div>

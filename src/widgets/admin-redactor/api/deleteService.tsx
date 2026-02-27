@@ -2,7 +2,6 @@
 
 import { logger } from "@/shared/lib/logger";
 import prisma from "@/shared/lib/prisma";
-import { getServiceBySlug } from "@/entities/service";
 import { revalidateServicePaths } from "../serviceRevalidate.utils";
 import { isAdminServerSide } from "@/core/auth";
 
@@ -27,7 +26,16 @@ export async function deleteService(
             throw new Error("Slug обязателен");
         }
 
-        const service = await getServiceBySlug(serviceSlug);
+        const service = await prisma.service.findUnique({
+            where: { slug: serviceSlug },
+            include: {
+                category: {
+                    select: {
+                        slug: true,
+                    },
+                },
+            },
+        });
 
         if (!service) {
             throw new Error("Услуга не найдена");
@@ -39,7 +47,7 @@ export async function deleteService(
 
         await revalidateServicePaths([
             {
-                categorySlug: service.categorySlug,
+                categorySlug: service.category?.slug,
                 slug: service.slug,
             },
         ]);

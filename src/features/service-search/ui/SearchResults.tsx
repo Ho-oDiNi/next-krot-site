@@ -28,7 +28,7 @@ const SearchResults = ({ query, results, className }: SearchResultsProps) => {
                                 className="flex flex-col rounded-lg px-3 py-2 transition hover:bg-stone-200"
                             >
                                 <span className="text-sm font-semibold text-neutral-900 sm:text-base">
-                                    {service.shortName ?? service.title}
+                                    {service.title}
                                 </span>
                                 <span className="text-xs text-stone-500 sm:text-sm">
                                     {category.name}

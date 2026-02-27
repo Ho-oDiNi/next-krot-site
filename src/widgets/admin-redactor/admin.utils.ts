@@ -2,28 +2,14 @@ import { Category } from "@/entities/category";
 import { Service } from "@/entities/service";
 
 export const createEmptyService = (): Service => ({
-    id: 0,
     slug: "",
-    shortName: "",
     metaTitle: "",
     metaDescription: "",
     title: "",
     description: "",
-    contentTitle: "",
-    contentDescription: "",
     mainText: "",
-    comparedImages: undefined,
-    price: 0,
-    priceAbbr: "",
-    priceExplanation: "",
     guarantee: "",
     duration: "",
-    whatIncluded: [],
-    materials: [],
-    faqDescription: "",
-    faqItems: [],
-    categoryId: undefined,
-    categorySlug: undefined,
 });
 
 export const fetchServiceBySlug = async (
@@ -69,10 +55,5 @@ export const getServiceTitle = (
     formData: Service,
     serviceSlug: string | undefined,
 ): string => {
-    return (
-        formData.title?.trim() ||
-        formData.shortName?.trim() ||
-        serviceSlug?.trim() ||
-        "эту услугу"
-    );
+    return formData.title?.trim() || serviceSlug?.trim() || "эту услугу";
 };

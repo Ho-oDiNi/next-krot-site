@@ -8,8 +8,8 @@ const MetaView = ({ formData, onChange, onBack }: BaseViewProps) => (
         <MetaDataField
             formData={{
                 slug: formData.slug,
-                metaTitle: formData.metaTitle as string,
-                metaDescription: formData.metaDescription as string,
+                metaTitle: formData.metaTitle,
+                metaDescription: formData.metaDescription,
             }}
             onChange={onChange}
         />
