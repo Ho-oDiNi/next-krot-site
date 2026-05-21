@@ -1,10 +1,19 @@
-import { SubdomainProps } from "../model";
-import HeaderBottom from "./HeaderBottom";
+import { Logo } from "@/shared/ui/Logo";
+import { BurgerMenu } from "./BurgerMenu";
+import { SearchBar } from "./SearchBar";
+import { ThemeSwitcher } from "./ThemeSwitcher";
+import { HeaderNavigation } from "./HeaderNavigation";
 
-const Header = ({ cityName }: SubdomainProps) => {
+const Header = () => {
     return (
-        <header>
-            <HeaderBottom />
+        <header className="flex-between fixed top-0 z-10 w-full bg-gray-200 p-6 lg:p-8">
+            <BurgerMenu className="lg:hidden" />
+            <HeaderNavigation className="hidden gap-8 lg:flex" />
+            <Logo className="lg:absolute-center" />
+            <div className="flex gap-8">
+                <ThemeSwitcher />
+                <SearchBar />
+            </div>
         </header>
     );
 };

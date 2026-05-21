@@ -43,7 +43,7 @@ const ContentDataField = ({ formData, onChange }: ContentDataFieldProps) => {
             />
 
             <InputField
-                label="Гарантия"
+                label="Тег #1"
                 type="text"
                 value={formData.guarantee}
                 onChange={(value) => onChange("guarantee", value)}
@@ -51,7 +51,7 @@ const ContentDataField = ({ formData, onChange }: ContentDataFieldProps) => {
             />
 
             <InputField
-                label="Срок выполнения"
+                label="Тег #2"
                 type="text"
                 value={formData.duration}
                 onChange={(value) => onChange("duration", value)}

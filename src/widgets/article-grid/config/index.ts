@@ -1,0 +1,62 @@
+import { Article } from "@/entities/article";
+import { Author } from "@/entities/author";
+import { Tag } from "@/entities/tag";
+
+const MOCK_ATTICLES: Article[] = [
+    {
+        id: 1,
+        slug: "test",
+        title: "Лишение премии — законно или нет? Судебная практиках и последние изменения в законах",
+        previewImg: null,
+        readingTime: 5,
+        likesCount: 1,
+        mainText:
+            "За 2023-2025 годы законодательство стало строже в вопросе стимулирующих выплат. Теперь работодатели не могут отделаться размытыми правилами или за один проступок лишить сотрудника премии на год. В статье разобрали несколько реальных судебных дел о том, как работники отстаивают свои права на бонусы.",
+        datePublic: "04 Марта 2026",
+    },
+    {
+        id: 2,
+        slug: "test",
+        title: "Лишение премии — законно или нет? Судебная практиках и последние изменения в законах",
+        previewImg: null,
+        readingTime: 5,
+        likesCount: 1,
+        mainText:
+            "За 2023-2025 годы законодательство стало строже в вопросе стимулирующих выплат. Теперь работодатели не могут отделаться размытыми правилами или за один проступок лишить сотрудника премии на год. В статье разобрали несколько реальных судебных дел о том, как работники отстаивают свои права на бонусы.",
+        datePublic: "04 Марта 2026",
+    },
+];
+
+const MOCK_AUTHOR: Author = {
+    id: 1,
+    slug: "test",
+    name: "Иван Иванов",
+    description:
+        "Автор статей о трудовом праве и защите прав работников. Юрист с 10-летним опытом, специализирующийся на трудовых спорах и консультировании по вопросам оплаты труда.",
+    avatarImg: null,
+};
+
+const MOCK_TAGS: Tag[] = [
+    {
+        id: 1,
+        slug: "test",
+        name: "Законы и право",
+    },
+    {
+        id: 2,
+        slug: "test",
+        name: "Полезно",
+    },
+];
+
+export const getMockArticles = async () => {
+    return MOCK_ATTICLES;
+};
+
+export const getMockAuthor = async () => {
+    return MOCK_AUTHOR;
+};
+
+export const getMockTags = async () => {
+    return MOCK_TAGS;
+};
