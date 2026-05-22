@@ -13,7 +13,7 @@ interface ArticleCardProps {
 
 export const ArticleHeader = ({ article, author, tags }: ArticleCardProps) => {
     return (
-        <div className="md:flex-between block space-y-3 text-xs">
+        <div className="md:flex-between block space-y-3 text-xs md:space-y-0">
             <div className="flex items-center gap-3">
                 <Image
                     src={author.avatarImg || defaultAvatarImg}
