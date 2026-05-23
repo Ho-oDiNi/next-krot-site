@@ -1,17 +1,38 @@
-import Image from "next/image";
-import vkIcon from "@icons/vk-white.svg";
-import tgIcon from "@icons/tg-white.svg";
+import VkIcon from "@icons/vk-small.svg";
+import TgIcon from "@icons/tg-small.svg";
 
-export const SocialLinks = () => {
+import { cn } from "@/shared/lib/cn";
+
+type SocialLinksProps = { variant?: "burger" | "default" };
+
+export const SocialLinks = ({ variant = "default" }: SocialLinksProps) => {
     return (
-        <div className="space-y-3">
+        <div
+            className={cn(
+                variant === "burger" ? "flex-center gap-2" : "space-y-3",
+            )}
+        >
             <p className="text-sm">Крот в соцсетях</p>
             <div className="flex gap-2">
                 <a href="">
-                    <Image src={vkIcon} alt="Мы в ВКонтакте" />
+                    <VkIcon
+                        className={cn(
+                            variant === "burger"
+                                ? "text-slate-300"
+                                : "text-white",
+                        )}
+                        alt="Мы в ВКонтакте"
+                    />
                 </a>
                 <a href="">
-                    <Image src={tgIcon} alt="Мы в Telegram" />
+                    <TgIcon
+                        className={cn(
+                            variant === "burger"
+                                ? "text-slate-300"
+                                : "text-white",
+                        )}
+                        alt="Мы в Telegram"
+                    />
                 </a>
             </div>
         </div>

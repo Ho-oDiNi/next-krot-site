@@ -1,9 +1,9 @@
 import { Article } from "@/entities/article";
-import { ReadMore } from "./ReadMore";
-import { ArticleBody } from "./ArticleBody";
 import { Author } from "@/entities/author";
-import { ArticleHeader } from "./ArticleHeader";
 import { Tag } from "@/entities/tag";
+
+import { ArticleHeader } from "./ArticleHeader";
+import { ArticlePreview } from "./ArticlePreview";
 
 interface ArticleCardProps {
     article: Article;
@@ -11,16 +11,11 @@ interface ArticleCardProps {
     tags: Tag[];
 }
 
-export const ArticleCard = async ({
-    article,
-    author,
-    tags,
-}: ArticleCardProps) => {
+export const ArticleCard = ({ article, author, tags }: ArticleCardProps) => {
     return (
         <article className="space-y-6 overflow-hidden rounded-3xl bg-white p-6">
             <ArticleHeader article={article} author={author} tags={tags} />
-            <ArticleBody article={article} />
-            <ReadMore article={article} />
+            <ArticlePreview article={article} />
         </article>
     );
 };

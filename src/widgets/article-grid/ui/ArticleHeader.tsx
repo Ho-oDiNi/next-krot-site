@@ -1,7 +1,7 @@
 import { Article } from "@/entities/article";
 import { Author } from "@/entities/author";
 import Image from "next/image";
-import defaultAvatarImg from "@icons/default-avatar.svg";
+import DefaultAvatarImg from "@icons/default-avatar.svg";
 import { Tag } from "@/entities/tag";
 import Link from "next/link";
 
@@ -15,13 +15,17 @@ export const ArticleHeader = ({ article, author, tags }: ArticleCardProps) => {
     return (
         <div className="md:flex-between block space-y-3 text-xs md:space-y-0">
             <div className="flex items-center gap-3">
-                <Image
-                    src={author.avatarImg || defaultAvatarImg}
-                    alt={author.name}
-                    width={50}
-                    height={50}
-                    className="rounded-full"
-                />
+                {author.avatarImg ? (
+                    <Image
+                        src={author.avatarImg}
+                        alt={author.name}
+                        width={50}
+                        height={50}
+                        className="rounded-full"
+                    />
+                ) : (
+                    <DefaultAvatarImg alt={author.name} />
+                )}
                 <div className="flex flex-col gap-1">
                     <span className="text-gray-500">{article.datePublic}</span>
                     <span className="font-semibold">{author.name}</span>

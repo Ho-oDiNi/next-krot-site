@@ -1,9 +1,16 @@
+import Image from "next/image";
+
 import { Article } from "@/entities/article";
 import { cn } from "@/shared/lib/cn";
-import Image from "next/image";
+
 import defaultImg from "@images/mockImg.png";
 
-export const ArticleBody = ({ article }: { article: Article }) => {
+interface ArticleBodyProps {
+    article: Article;
+    isExpanded: boolean;
+}
+
+export const ArticleBody = ({ article, isExpanded }: ArticleBodyProps) => {
     return (
         <>
             <Image
@@ -13,6 +20,7 @@ export const ArticleBody = ({ article }: { article: Article }) => {
                 width={404}
                 className="h-80 w-full rounded-xl object-cover"
             />
+
             <div>
                 <h2
                     className={cn(
@@ -21,8 +29,20 @@ export const ArticleBody = ({ article }: { article: Article }) => {
                 >
                     {article.title}
                 </h2>
-                <div className="space-y-2 text-base md:text-lg">
-                    {article.mainText}
+
+                <div className="relative">
+                    <div
+                        className={cn(
+                            "space-y-2 overflow-hidden text-base leading-7 transition-[max-height] duration-500 ease-in-out md:text-lg md:leading-8",
+                            isExpanded ? "max-h-500" : "max-h-30 md:max-h-50",
+                        )}
+                    >
+                        {article.mainText}
+                    </div>
+
+                    {!isExpanded && (
+                        <div className="pointer-events-none absolute bottom-0 left-0 h-12 w-full bg-linear-to-t from-white to-transparent" />
+                    )}
                 </div>
             </div>
         </>

@@ -1,9 +1,42 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Tag } from "@/entities/tag";
 
-import { getMockTags } from "@/widgets/article-grid/config";
+export const TagMap = () => {
+    const [tags, setTags] = useState<Tag[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-export const TagMap = async () => {
-    const tags = await getMockTags();
+    useEffect(() => {
+        const fetchTags = async () => {
+            try {
+                const response = await fetch("/api/tags");
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch tags");
+                }
+
+                const data: Tag[] = await response.json();
+
+                setTags(data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchTags();
+    }, []);
+
+    if (isLoading) {
+        return <div className="text-sm opacity-60">Загрузка тем...</div>;
+    }
+
+    if (!tags.length) {
+        return null;
+    }
 
     return (
         <div className="flex flex-wrap gap-3">

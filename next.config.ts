@@ -7,27 +7,13 @@ const nextConfig: NextConfig = {
             bodySizeLimit: "10mb",
         },
     },
-    async redirects() {
-        return [
-            {
-                source: "/services/remont-mezhpanelnykh-shvov",
-                destination:
-                    "/services/mezhpanelnyye-shvy/remont-mezhpanelnykh-shvov",
-                permanent: false,
+    turbopack: {
+        rules: {
+            "*.svg": {
+                loaders: ["@svgr/webpack"],
+                as: "*.js",
             },
-            {
-                source: "/services/germetizatsiya-mezhpanelnykh-shvov",
-                destination:
-                    "/services/mezhpanelnyye-shvy/germetizatsiya-mezhpanelnykh-shvov",
-                permanent: false,
-            },
-            {
-                source: "/services/pervichnaya-zadelka-shvov",
-                destination:
-                    "/services/mezhpanelnyye-shvy/pervichnaya-zadelka-shvov",
-                permanent: false,
-            },
-        ];
+        },
     },
 };
 
