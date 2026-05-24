@@ -28,16 +28,20 @@ export const ArticleHeader = ({ article, author, tags }: ArticleCardProps) => {
                 )}
                 <div className="flex flex-col gap-1">
                     <span className="text-gray-500">{article.datePublic}</span>
-                    <span className="font-semibold">{author.name}</span>
+                    <span className="font-semibold text-black dark:text-white">
+                        {author.name}
+                    </span>
                 </div>
             </div>
             <div className="flex flex-col gap-1">
                 <span className="text-gray-500">Время чтения</span>
-                <span>~ {article.readingTime ?? 7} мин</span>
+                <span className="text-black dark:text-white">
+                    ~ {article.readingTime ?? 7} мин
+                </span>
             </div>
             <div className="flex flex-col gap-1">
                 <span className="text-gray-500">Темы</span>
-                <span className="flex gap-1 text-nowrap">
+                <span className="flex gap-1 text-nowrap text-black dark:text-white">
                     {tags.map((tag) => (
                         <Link
                             key={tag.id}

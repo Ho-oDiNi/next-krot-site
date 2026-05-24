@@ -32,14 +32,14 @@ const RootLayout = async ({
             <body
                 className={cn(
                     FontMontserrat.className,
-                    "bg-gray-200 antialiased",
+                    "bg-gray-200 antialiased dark:bg-slate-800",
                 )}
             >
                 <YandexMetrika />
                 <ModalProvider>
                     <Header />
 
-                    <div className="mx-auto mt-19 flex w-full max-w-360 justify-between gap-8 px-4 md:mt-26">
+                    <div className="mx-auto mt-22 flex w-full max-w-360 justify-between gap-8 px-4 md:mt-28">
                         <aside className="hidden w-58 shrink-0 lg:block">
                             <div className="sticky top-44 space-y-10">
                                 <TagMap />

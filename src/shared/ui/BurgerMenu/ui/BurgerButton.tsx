@@ -15,7 +15,10 @@ export const BurgerButton = () => {
 
     return (
         <button onClick={() => handleOpen()} className="block lg:hidden">
-            <BurgerIcon alt="Открыть меню навигации" />
+            <BurgerIcon
+                alt="Открыть меню навигации"
+                className="text-black dark:text-white"
+            />
         </button>
     );
 };

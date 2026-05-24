@@ -7,7 +7,10 @@ export const SearchBar = () => {
             className="flex-between rounded-full lg:h-10 lg:w-60 lg:bg-white lg:py-3 lg:pr-3 lg:pl-4"
         >
             <span className="hidden text-xs lg:block">Искать</span>
-            <SearchIcon alt="Поиск статей" />
+            <SearchIcon
+                alt="Поиск статей"
+                className="text-black dark:text-white md:dark:text-black"
+            />
         </button>
     );
 };

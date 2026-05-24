@@ -4,3 +4,5 @@
 @import "../styles/_theme.css";
 @import "../styles/_utility.css";
 @import "../styles/_components.css";
+
+@custom-variant dark (&:where(.dark, .dark *));

@@ -24,13 +24,13 @@ export const ArticleBody = ({ article, isExpanded }: ArticleBodyProps) => {
             <div>
                 <h2
                     className={cn(
-                        "text-h3 mb-6 text-2xl font-bold md:text-3xl",
+                        "text-h3 mb-6 text-2xl font-bold text-black md:text-3xl dark:text-white",
                     )}
                 >
                     {article.title}
                 </h2>
 
-                <div className="relative">
+                <div className="relative text-black dark:text-white">
                     <div
                         className={cn(
                             "space-y-2 overflow-hidden text-base leading-7 transition-[max-height] duration-500 ease-in-out md:text-lg md:leading-8",
@@ -41,7 +41,7 @@ export const ArticleBody = ({ article, isExpanded }: ArticleBodyProps) => {
                     </div>
 
                     {!isExpanded && (
-                        <div className="pointer-events-none absolute bottom-0 left-0 h-12 w-full bg-linear-to-t from-white to-transparent" />
+                        <div className="pointer-events-none absolute bottom-0 left-0 h-12 w-full bg-linear-to-t from-white to-transparent dark:from-gray-900" />
                     )}
                 </div>
             </div>

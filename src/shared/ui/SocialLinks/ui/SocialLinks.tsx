@@ -12,7 +12,7 @@ export const SocialLinks = ({ variant = "default" }: SocialLinksProps) => {
                 variant === "burger" ? "flex-center gap-2" : "space-y-3",
             )}
         >
-            <p className="text-sm">Крот в соцсетях</p>
+            <p className="text-sm dark:text-white">Крот в соцсетях</p>
             <div className="flex gap-2">
                 <a href="">
                     <VkIcon
