@@ -1,27 +1,39 @@
 import Image from "next/image";
 import notFoundImage from "@images/404.gif";
-import StyledSection from "@/shared/ui/StyledSection";
-import { StyledLink } from "../shared/ui/StyledLink";
+
+import { ArticleGrid } from "@/widgets/article-grid";
 
 export default function Custom404() {
     return (
-        <StyledSection isSecondary={true} sectionClassName="min-h-150">
-            <div className="flex-center flex-col-reverse gap-6 md:flex-row">
-                <div className="flex flex-col gap-8 md:gap-12">
-                    <hgroup>
-                        <h1 className="text-h1">Страница не найдена</h1>
-                        <p className="text-main">Но есть много других</p>
-                    </hgroup>
-                    <StyledLink href="/" variant="primary" size="lg">
-                        На главную
-                    </StyledLink>
+        <div className="flex-center flex-col-reverse gap-6 md:flex-row">
+            <div className="flex flex-col gap-8 md:gap-12">
+                <h1 className="text-center text-3xl font-bold md:text-4xl dark:text-white">
+                    Такой страницы нет, или что-то пошло не так. Крот уже
+                    разбирается
+                </h1>
+
+                <div className="relative mx-auto w-full max-w-220">
+                    <Image
+                        src="/icons/404.svg"
+                        alt="Ошибка 404"
+                        width={844}
+                        height={300}
+                        className="h-auto w-full"
+                    />
+                    {/* TODO: сделать темную тему */}
+                    <Image
+                        src={notFoundImage}
+                        alt=""
+                        className="absolute-center h-auto w-[22%] max-w-40 min-w-14"
+                    />
                 </div>
-                <Image
-                    src={notFoundImage}
-                    alt="Ошибка 404"
-                    className="h-auto w-100"
-                />
+
+                <p className="text-center text-3xl font-bold md:text-4xl dark:text-white">
+                    Но может будет полезно:
+                </p>
+
+                <ArticleGrid />
             </div>
-        </StyledSection>
+        </div>
     );
 }
