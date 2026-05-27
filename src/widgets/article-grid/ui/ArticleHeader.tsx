@@ -27,7 +27,7 @@ export const ArticleHeader = ({ article, author, tags }: ArticleCardProps) => {
                     <DefaultAvatarImg alt={author.name} />
                 )}
                 <div className="flex flex-col gap-1">
-                    <span className="text-gray-500">{article.datePublic}</span>
+                    <span className="text-gray-500">{article.updatedAt}</span>
                     <span className="font-semibold text-black dark:text-white">
                         {author.name}
                     </span>

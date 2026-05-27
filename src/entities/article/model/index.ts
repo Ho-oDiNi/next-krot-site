@@ -1,3 +1,6 @@
+import { Author } from "@/entities/author";
+import { Tag } from "@/entities/tag";
+
 export interface Article {
     id: number;
     slug: string;
@@ -5,6 +8,11 @@ export interface Article {
     previewImg: string | null;
     likesCount: number;
     mainText: string;
-    datePublic: string;
+    updatedAt: string;
     readingTime: number | null;
+}
+
+export interface ArticleWithRelations extends Article {
+    author: Author;
+    tags: Tag[];
 }
