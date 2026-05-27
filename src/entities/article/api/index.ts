@@ -1,3 +1,5 @@
+import prisma from "@/shared/lib/prisma";
+
 interface GetArticlesParams {
     page?: number;
     limit?: number;
@@ -6,10 +8,7 @@ interface GetArticlesParams {
 export const getArticles = async ({
     page = 1,
     limit = 10,
-}: {
-    page?: number;
-    limit?: number;
-}) => {
+}: GetArticlesParams) => {
     if (!prisma) {
         throw new Error("Prisma client is not initialized");
     }
