@@ -1,24 +1,32 @@
 "use client";
 
-import { Article } from "@prisma/client";
-import { useEffect, useRef, useState } from "react";
+import { ArticleWithRelations } from "@/entities/article/model";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-export const useInfiniteArticles = (initialArticles: Article[] = []) => {
-    const [articles, setArticles] = useState<Article[]>(initialArticles);
+interface ArticlesApiResponse {
+    articles: ArticleWithRelations[];
+    hasMore: boolean;
+}
+
+export const useInfiniteArticles = (
+    initialArticles: ArticleWithRelations[] = [],
+) => {
+    const [articles, setArticles] =
+        useState<ArticleWithRelations[]>(initialArticles);
     const [page, setPage] = useState(2);
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
     const loaderRef = useRef<HTMLDivElement | null>(null);
 
-    const loadMoreArticles = async () => {
+    const loadMoreArticles = useCallback(async () => {
         if (isLoading || !hasMore) return;
 
         setIsLoading(true);
 
         try {
             const response = await fetch(`/api/articles?page=${page}&limit=10`);
-            const data = await response.json();
+            const data: ArticlesApiResponse = await response.json();
 
             setArticles((prev) => [...prev, ...data.articles]);
             setHasMore(data.hasMore);
@@ -26,7 +34,7 @@ export const useInfiniteArticles = (initialArticles: Article[] = []) => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [hasMore, isLoading, page]);
 
     useEffect(() => {
         const loader = loaderRef.current;
@@ -43,7 +51,7 @@ export const useInfiniteArticles = (initialArticles: Article[] = []) => {
         return () => {
             observer.unobserve(loader);
         };
-    }, [page, hasMore, isLoading]);
+    }, [loadMoreArticles]);
 
     return {
         articles,
