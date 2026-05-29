@@ -15,13 +15,10 @@ interface BurgerMenuProps {
 export const BurgerMenu = ({ onClose }: BurgerMenuProps) => {
     return (
         <div className="w-full space-y-25 bg-white p-4 dark:bg-gray-900">
-            <Link
-                href="/"
+            <Logo
+                className="text-h3 absolute-x-center mt-1"
                 onClick={onClose}
-                className="text-h3 absolute-x-center"
-            >
-                <Logo />
-            </Link>
+            />
 
             <button
                 onClick={onClose}
@@ -52,7 +49,7 @@ export const BurgerMenu = ({ onClose }: BurgerMenuProps) => {
                 <p className="text-bold text-2xl text-black dark:text-white">
                     Наши темы
                 </p>
-                <TagMap />
+                <TagMap onClick={onClose} />
             </div>
             <SocialLinks variant="burger" />
         </div>

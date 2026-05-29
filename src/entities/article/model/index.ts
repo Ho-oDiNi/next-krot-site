@@ -8,8 +8,9 @@ export interface Article {
     previewImg: string | null;
     likesCount: number;
     mainText: string;
-    updatedAt: string;
     readingTime: number | null;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface ArticleWithRelations extends Article {

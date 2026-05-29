@@ -14,7 +14,10 @@ interface ArticleCardProps {
 export const ArticleHeader = ({ article, author, tags }: ArticleCardProps) => {
     return (
         <div className="md:flex-between block space-y-3 text-xs md:space-y-0">
-            <div className="flex items-center gap-3">
+            <Link
+                href={`/author/${author.slug}`}
+                className="flex items-center gap-3"
+            >
                 {author.avatarImg ? (
                     <Image
                         src={author.avatarImg}
@@ -27,12 +30,18 @@ export const ArticleHeader = ({ article, author, tags }: ArticleCardProps) => {
                     <DefaultAvatarImg alt={author.name} />
                 )}
                 <div className="flex flex-col gap-1">
-                    <span className="text-gray-500">{article.updatedAt}</span>
+                    <span className="text-gray-500">
+                        {article.updatedAt.toLocaleDateString("ru-RU", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                        })}
+                    </span>
                     <span className="font-semibold text-black dark:text-white">
                         {author.name}
                     </span>
                 </div>
-            </div>
+            </Link>
             <div className="flex flex-col gap-1">
                 <span className="text-gray-500">Время чтения</span>
                 <span className="text-black dark:text-white">
@@ -45,7 +54,7 @@ export const ArticleHeader = ({ article, author, tags }: ArticleCardProps) => {
                     {tags.map((tag) => (
                         <Link
                             key={tag.id}
-                            href={`/tags/${tag.slug}`}
+                            href={`/tag/${tag.slug}`}
                             className=""
                         >
                             #{tag.name}

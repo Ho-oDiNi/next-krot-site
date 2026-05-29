@@ -23,12 +23,11 @@
     @apply 2xs:text-base text-sm;
   }
 
-  .service__main-content,
-  .service__datalist-content {
+  .article__main-content {
     p,
     a,
     li {
-      @apply text-base;
+      @apply text-lg;
     }
     a {
       @apply text-blue-600 hover:opacity-70;

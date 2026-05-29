@@ -9,7 +9,7 @@ const Header = () => {
         <header className="flex-between fixed top-0 z-10 w-full bg-gray-200 p-6 lg:p-8 dark:bg-slate-800">
             <BurgerButton />
             <HeaderNavigation className="hidden gap-8 lg:flex dark:text-white" />
-            <Logo className="lg:absolute-center" />
+            <Logo className="xs:absolute-center" />
             <div className="flex gap-8">
                 <ThemeSwitcher />
                 <SearchBar />

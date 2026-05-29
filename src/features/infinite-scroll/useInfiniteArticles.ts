@@ -1,6 +1,7 @@
 "use client";
 
 import { ArticleWithRelations } from "@/entities/article/model";
+import { ArticleGridFilters } from "@/widgets/article-grid/ui/ArticleGrid";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ArticlesApiResponse {
@@ -10,6 +11,7 @@ interface ArticlesApiResponse {
 
 export const useInfiniteArticles = (
     initialArticles: ArticleWithRelations[] = [],
+    filters?: ArticleGridFilters,
 ) => {
     const [articles, setArticles] =
         useState<ArticleWithRelations[]>(initialArticles);
@@ -25,7 +27,23 @@ export const useInfiniteArticles = (
         setIsLoading(true);
 
         try {
-            const response = await fetch(`/api/articles?page=${page}&limit=10`);
+            const searchParams = new URLSearchParams({
+                page: String(page),
+                limit: "10",
+            });
+
+            if (filters?.authorId) {
+                searchParams.set("authorId", String(filters.authorId));
+            }
+
+            if (filters?.tagId) {
+                searchParams.set("tagId", String(filters.tagId));
+            }
+
+            const response = await fetch(
+                `/api/articles?${searchParams.toString()}`,
+            );
+
             const data: ArticlesApiResponse = await response.json();
 
             setArticles((prev) => [...prev, ...data.articles]);
@@ -34,7 +52,13 @@ export const useInfiniteArticles = (
         } finally {
             setIsLoading(false);
         }
-    }, [hasMore, isLoading, page]);
+    }, [filters?.authorId, filters?.tagId, hasMore, isLoading, page]);
+
+    useEffect(() => {
+        setArticles(initialArticles);
+        setPage(2);
+        setHasMore(true);
+    }, [initialArticles, filters?.authorId, filters?.tagId]);
 
     useEffect(() => {
         const loader = loaderRef.current;

@@ -1,27 +1,38 @@
-import prisma from "@/shared/lib/prisma";
+import { prisma } from "@/shared/lib/prisma";
 
 interface GetArticlesParams {
-    page?: number;
-    limit?: number;
+    page: number;
+    limit: number;
+    filters?: {
+        authorId?: number;
+        tagId?: number;
+    };
 }
 
 export const getArticles = async ({
-    page = 1,
-    limit = 10,
+    page,
+    limit,
+    filters,
 }: GetArticlesParams) => {
-    if (!prisma) {
-        throw new Error("Prisma client is not initialized");
-    }
-
     return prisma.article.findMany({
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy: {
-            createdAt: "desc",
+        where: {
+            authorId: filters?.authorId,
+            tags: filters?.tagId
+                ? {
+                      some: {
+                          id: filters.tagId,
+                      },
+                  }
+                : undefined,
         },
         include: {
             author: true,
             tags: true,
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: {
+            updatedAt: "desc",
         },
     });
 };

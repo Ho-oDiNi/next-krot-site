@@ -1,11 +1,21 @@
 import { getArticles } from "@/entities/article/api";
 import { ArticleGridClient } from "./ArticleGridClient";
 
-export const ArticleGrid = async () => {
+export interface ArticleGridFilters {
+    authorId?: number;
+    tagId?: number;
+}
+
+interface ArticleGridProps {
+    filters?: ArticleGridFilters;
+}
+
+export const ArticleGrid = async ({ filters }: ArticleGridProps) => {
     const articles = await getArticles({
         page: 1,
         limit: 10,
+        filters,
     });
 
-    return <ArticleGridClient initialArticles={articles} />;
+    return <ArticleGridClient initialArticles={articles} filters={filters} />;
 };

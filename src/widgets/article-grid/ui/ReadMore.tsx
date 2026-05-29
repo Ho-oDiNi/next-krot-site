@@ -13,23 +13,31 @@ interface ReadMoreProps {
     onToggle: () => void;
 }
 
-const mockToggleLike = async ({
+const toggleLike = async ({
     articleId,
     isLiked,
 }: {
-    articleId: string | number;
+    articleId: number;
     isLiked: boolean;
 }) => {
-    await new Promise((resolve) => setTimeout(resolve, 400));
-
-    console.log("Моковая отправка лайка в БД:", {
-        articleId,
-        isLiked,
+    const response = await fetch(`/api/articles/${articleId}/like`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isLiked }),
     });
 
-    return {
-        success: true,
-    };
+    if (!response.ok) {
+        throw new Error("Failed to update like");
+    }
+
+    return response.json() as Promise<{
+        article: {
+            id: number;
+            likesCount: number;
+        };
+    }>;
 };
 
 export const ReadMore = ({ article, isExpanded, onToggle }: ReadMoreProps) => {
@@ -38,25 +46,24 @@ export const ReadMore = ({ article, isExpanded, onToggle }: ReadMoreProps) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleLikeClick = async () => {
-        if (isLoading) {
-            return;
-        }
+        if (isLoading) return;
 
         const nextIsLiked = !isLiked;
-        const nextLikesCount = nextIsLiked ? likesCount + 1 : likesCount - 1;
 
         setIsLiked(nextIsLiked);
-        setLikesCount(nextLikesCount);
+        setLikesCount((prev) => prev + (nextIsLiked ? 1 : -1));
         setIsLoading(true);
 
         try {
-            await mockToggleLike({
+            const data = await toggleLike({
                 articleId: article.id,
                 isLiked: nextIsLiked,
             });
+
+            setLikesCount(data.article.likesCount);
         } catch (error) {
             setIsLiked(isLiked);
-            setLikesCount(likesCount);
+            setLikesCount((prev) => prev + (nextIsLiked ? -1 : 1));
 
             console.error("Ошибка при отправке лайка:", error);
         } finally {

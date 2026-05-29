@@ -4,6 +4,7 @@ import { Article } from "@/entities/article";
 import { cn } from "@/shared/lib/cn";
 
 import defaultImg from "@images/mockImg.png";
+import { ParsedHTML } from "@/shared/lib/html-react-parser";
 
 interface ArticleBodyProps {
     article: Article;
@@ -33,11 +34,11 @@ export const ArticleBody = ({ article, isExpanded }: ArticleBodyProps) => {
                 <div className="relative text-black dark:text-white">
                     <div
                         className={cn(
-                            "space-y-2 overflow-hidden text-base leading-7 transition-[max-height] duration-500 ease-in-out md:text-lg md:leading-8",
+                            "article__main-content space-y-2 overflow-hidden text-base leading-7 transition-[max-height] duration-500 ease-in-out md:text-lg md:leading-8",
                             isExpanded ? "max-h-500" : "max-h-30 md:max-h-50",
                         )}
                     >
-                        {article.mainText}
+                        <ParsedHTML html={article.mainText} />
                     </div>
 
                     {!isExpanded && (

@@ -1,18 +1,23 @@
 "use client";
 
+import { ArticleWithRelations } from "@/entities/article/model";
 import { useInfiniteArticles } from "@/features/infinite-scroll/useInfiniteArticles";
 import { ArticleCard } from "./ArticleCard";
-import { ArticleWithRelations } from "@/entities/article/model";
+import { ArticleGridFilters } from "./ArticleGrid";
 
 interface ArticleGridClientProps {
     initialArticles: ArticleWithRelations[];
+    filters?: ArticleGridFilters;
 }
 
 export const ArticleGridClient = ({
     initialArticles,
+    filters,
 }: ArticleGridClientProps) => {
-    const { articles, loaderRef, isLoading, hasMore } =
-        useInfiniteArticles(initialArticles);
+    const { articles, loaderRef, isLoading, hasMore } = useInfiniteArticles(
+        initialArticles,
+        filters,
+    );
 
     return (
         <div className="w-full space-y-6">

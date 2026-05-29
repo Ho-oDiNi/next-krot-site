@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Tag } from "@/entities/tag";
 
-export const TagMap = () => {
+export const TagMap = ({ onClick }: { onClick?: () => void }) => {
     const [tags, setTags] = useState<Tag[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -43,8 +43,9 @@ export const TagMap = () => {
             {tags.map((tag) => (
                 <Link
                     key={tag.id}
-                    href={`/tags/${tag.slug}`}
+                    href={`/tag/${tag.slug}`}
                     className="rounded-full bg-slate-300 px-4 py-2 text-sm whitespace-nowrap"
+                    onClick={onClick}
                 >
                     {tag.name}
                 </Link>

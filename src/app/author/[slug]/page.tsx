@@ -1,12 +1,27 @@
+import { notFound } from "next/navigation";
+import Image from "next/image";
+
 import { cn } from "@/shared/lib/cn";
 import { ArticleGrid } from "@/widgets/article-grid";
-import { getMockAuthor } from "@/widgets/article-grid/config";
-import Image from "next/image";
+import { getAuthorBySlug } from "@/entities/author/api";
 
 const DEFAULT_AVATAR_SRC = "/icons/default-avatar.svg";
 
-const AuthorPage = async () => {
-    const author = await getMockAuthor();
+interface AuthorPageProps {
+    params: Promise<{
+        slug: string;
+    }>;
+}
+
+const AuthorPage = async ({ params }: AuthorPageProps) => {
+    const { slug } = await params;
+
+    const author = await getAuthorBySlug(slug);
+
+    if (!author) {
+        notFound();
+    }
+
     return (
         <div className="flex-center flex-col gap-6">
             <Image
@@ -16,6 +31,7 @@ const AuthorPage = async () => {
                 height={144}
                 className="rounded-full"
             />
+
             <hgroup className="flex-center flex-col gap-6">
                 <h1
                     className={cn(
@@ -24,12 +40,13 @@ const AuthorPage = async () => {
                 >
                     {author.name}
                 </h1>
+
                 <p className="text-center text-lg dark:text-white">
                     {author.description}
                 </p>
             </hgroup>
-            {/* TODO: по автору */}
-            <ArticleGrid />
+
+            <ArticleGrid filters={{ authorId: author.id }} />
         </div>
     );
 };
