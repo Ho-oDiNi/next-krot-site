@@ -15,10 +15,7 @@ interface BurgerMenuProps {
 export const BurgerMenu = ({ onClose }: BurgerMenuProps) => {
     return (
         <div className="w-full space-y-25 bg-white p-4 dark:bg-gray-900">
-            <Logo
-                className="text-h3 absolute-x-center mt-1"
-                onClick={onClose}
-            />
+            <Logo className="absolute-x-center mt-3" onClick={onClose} />
 
             <button
                 onClick={onClose}

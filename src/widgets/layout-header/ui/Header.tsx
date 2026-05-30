@@ -1,5 +1,5 @@
 import { Logo } from "@/shared/ui/Logo";
-import { SearchBar } from "./SearchBar";
+import { SearchButton } from "@/shared/ui/SearchMenu/ui/SearchButton";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { HeaderNavigation } from "./HeaderNavigation";
 import { BurgerButton } from "@/shared/ui/BurgerMenu";
@@ -12,7 +12,7 @@ const Header = () => {
             <Logo className="xs:absolute-center" />
             <div className="flex gap-8">
                 <ThemeSwitcher />
-                <SearchBar />
+                <SearchButton />
             </div>
         </header>
     );

@@ -10,7 +10,7 @@ export const BurgerButton = () => {
     const { openDialog, closeModal } = useModal();
 
     const handleOpen = () => {
-        openDialog(<BurgerMenu onClose={closeModal} />)("w-full");
+        openDialog(<BurgerMenu onClose={closeModal} />)();
     };
 
     return (
