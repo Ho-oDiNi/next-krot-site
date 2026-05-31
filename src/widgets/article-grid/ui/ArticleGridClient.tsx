@@ -8,15 +8,22 @@ import { ArticleGridFilters } from "./ArticleGrid";
 interface ArticleGridClientProps {
     initialArticles: ArticleWithRelations[];
     filters?: ArticleGridFilters;
+    isPublished?: boolean;
+    editBasePath?: string;
+    isInfiniteScrollEnabled?: boolean;
 }
 
 export const ArticleGridClient = ({
     initialArticles,
     filters,
+    isPublished = true,
+    editBasePath,
+    isInfiniteScrollEnabled = true,
 }: ArticleGridClientProps) => {
     const { articles, loaderRef, isLoading, hasMore } = useInfiniteArticles(
         initialArticles,
         filters,
+        isPublished,
     );
 
     return (
@@ -27,10 +34,17 @@ export const ArticleGridClient = ({
                     article={article}
                     author={article.author}
                     tags={article.tags}
+                    editHref={
+                        editBasePath
+                            ? `${editBasePath}/${article.slug}`
+                            : undefined
+                    }
                 />
             ))}
 
-            {hasMore && <div ref={loaderRef} className="h-10" />}
+            {isInfiniteScrollEnabled && hasMore && (
+                <div ref={loaderRef} className="h-10" />
+            )}
 
             {isLoading && (
                 <p className="text-center text-sm text-gray-500">Загрузка...</p>

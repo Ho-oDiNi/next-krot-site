@@ -8,6 +8,7 @@ export interface Article {
     previewImg: string | null;
     likesCount: number;
     mainText: string;
+    isPublished: boolean;
     readingTime: number | null;
     createdAt: Date;
     updatedAt: Date;

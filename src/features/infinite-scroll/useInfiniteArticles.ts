@@ -12,6 +12,7 @@ interface ArticlesApiResponse {
 export const useInfiniteArticles = (
     initialArticles: ArticleWithRelations[] = [],
     filters?: ArticleGridFilters,
+    isPublished = true,
 ) => {
     const [articles, setArticles] =
         useState<ArticleWithRelations[]>(initialArticles);
@@ -40,6 +41,8 @@ export const useInfiniteArticles = (
                 searchParams.set("tagId", String(filters.tagId));
             }
 
+            searchParams.set("isPublished", String(isPublished));
+
             const response = await fetch(
                 `/api/articles?${searchParams.toString()}`,
             );
@@ -52,13 +55,20 @@ export const useInfiniteArticles = (
         } finally {
             setIsLoading(false);
         }
-    }, [filters?.authorId, filters?.tagId, hasMore, isLoading, page]);
+    }, [
+        filters?.authorId,
+        filters?.tagId,
+        hasMore,
+        isLoading,
+        isPublished,
+        page,
+    ]);
 
     useEffect(() => {
         setArticles(initialArticles);
         setPage(2);
         setHasMore(true);
-    }, [initialArticles, filters?.authorId, filters?.tagId]);
+    }, [initialArticles, filters?.authorId, filters?.tagId, isPublished]);
 
     useEffect(() => {
         const loader = loaderRef.current;
