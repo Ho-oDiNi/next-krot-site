@@ -9,13 +9,19 @@ interface ArticleCardProps {
     article: Article;
     author: Author;
     tags: Tag[];
+    editHref?: string;
 }
 
-export const ArticleCard = ({ article, author, tags }: ArticleCardProps) => {
+export const ArticleCard = ({
+    article,
+    author,
+    tags,
+    editHref,
+}: ArticleCardProps) => {
     return (
         <article className="space-y-6 overflow-hidden rounded-3xl bg-white p-6 dark:bg-gray-900">
             <ArticleHeader article={article} author={author} tags={tags} />
-            <ArticlePreview article={article} />
+            <ArticlePreview article={article} editHref={editHref} />
         </article>
     );
 };

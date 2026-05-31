@@ -15,7 +15,7 @@ export const getArticles = async ({
     page,
     limit,
     filters,
-    isPublished = true,
+    isPublished,
 }: GetArticlesParams) => {
     return prisma.article.findMany({
         where: {
@@ -27,7 +27,7 @@ export const getArticles = async ({
                       },
                   }
                 : undefined,
-            isPublished: isPublished,
+            isPublished,
         },
         include: {
             author: true,
@@ -35,9 +35,7 @@ export const getArticles = async ({
         },
         skip: (page - 1) * limit,
         take: limit,
-        orderBy: {
-            updatedAt: "desc",
-        },
+        orderBy: [{ isPublished: "asc" }, { updatedAt: "desc" }],
     });
 };
 
