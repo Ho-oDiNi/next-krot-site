@@ -15,6 +15,7 @@ export const ArticleGrid = async ({ filters }: ArticleGridProps) => {
         page: 1,
         limit: 10,
         filters,
+        isPublished: true,
     });
 
     return <ArticleGridClient initialArticles={articles} filters={filters} />;

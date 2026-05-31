@@ -1,19 +1,19 @@
 "use client";
 
-import Image, { StaticImageData } from "next/image";
+import { ReactNode } from "react";
 
 interface AdminButtonProps {
-    icon: StaticImageData;
     callback?: () => void;
+    children: ReactNode;
 }
 
-const AdminButton = ({ icon, callback }: AdminButtonProps) => {
+const AdminButton = ({ callback, children }: AdminButtonProps) => {
     return (
         <button
-            className="h-10 w-10 rounded-full bg-white hover:bg-slate-300"
+            className="size-10 rounded-full bg-white hover:bg-slate-300 dark:bg-slate-700"
             onClick={callback}
         >
-            <Image src={icon} className="w-full" alt="" />
+            {children}
         </button>
     );
 };

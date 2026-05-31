@@ -94,6 +94,8 @@ model Article {
   mainText    String
   readingTime Int?
 
+  isPublished Boolean  @default(false)
+
   authorId    Int
   author      Author    @relation(fields: [authorId], references: [id])
 

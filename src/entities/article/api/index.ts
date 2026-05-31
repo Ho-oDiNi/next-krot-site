@@ -1,4 +1,5 @@
 import { prisma } from "@/shared/lib/prisma";
+import { ArticleWithRelations } from "../model";
 
 interface GetArticlesParams {
     page: number;
@@ -7,12 +8,14 @@ interface GetArticlesParams {
         authorId?: number;
         tagId?: number;
     };
+    isPublished?: boolean;
 }
 
 export const getArticles = async ({
     page,
     limit,
     filters,
+    isPublished = true,
 }: GetArticlesParams) => {
     return prisma.article.findMany({
         where: {
@@ -24,6 +27,7 @@ export const getArticles = async ({
                       },
                   }
                 : undefined,
+            isPublished: isPublished,
         },
         include: {
             author: true,
@@ -33,6 +37,20 @@ export const getArticles = async ({
         take: limit,
         orderBy: {
             updatedAt: "desc",
+        },
+    });
+};
+
+export const getArticleBySlug = async (
+    slug: string,
+): Promise<ArticleWithRelations | null> => {
+    return prisma.article.findUnique({
+        where: {
+            slug,
+        },
+        include: {
+            author: true,
+            tags: true,
         },
     });
 };
