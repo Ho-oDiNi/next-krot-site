@@ -6,6 +6,8 @@ export interface ArticleRedactorFormData {
     mainText: string;
     readingTime: string;
     isPublished: boolean;
+    authorId: number;
+    tagIds: number[];
 }
 
 export interface UpdateArticlePayload {
@@ -16,6 +18,8 @@ export interface UpdateArticlePayload {
     mainText: string;
     previewImageFile?: File | null;
     isPublished: boolean;
+    authorId: number;
+    tagIds: number[];
 }
 
 export interface UpdateArticleResult {

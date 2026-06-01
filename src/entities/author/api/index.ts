@@ -9,3 +9,11 @@ export const getAuthorBySlug = async (slug: string): Promise<Author | null> => {
         },
     });
 };
+
+export const getAuthors = async (): Promise<Author[]> => {
+    return prisma.author.findMany({
+        orderBy: {
+            name: "asc",
+        },
+    });
+};

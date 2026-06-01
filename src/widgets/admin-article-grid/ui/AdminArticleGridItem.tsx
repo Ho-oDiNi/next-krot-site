@@ -15,6 +15,7 @@ export const AdminArticleGridItem = ({
 }: AdminArticleGridItemProps) => {
     const editHref = `/admin/redactor/article/${article.slug}`;
     const statusText = article.isPublished ? "Published" : "Draft";
+    const tagList = article.tags.map((tag) => `#${tag.name}`).join(" / ");
 
     return (
         <article className="flex items-center gap-4 border-b border-slate-200 py-5 last:border-b-0 sm:gap-6 dark:border-slate-800">
@@ -44,6 +45,10 @@ export const AdminArticleGridItem = ({
                         month: "long",
                         year: "numeric",
                     })}
+                </p>
+
+                <p className="mt-1 line-clamp-1 text-xs leading-tight text-slate-500 sm:text-sm dark:text-slate-400">
+                    {tagList || "Без тем"}
                 </p>
 
                 <p

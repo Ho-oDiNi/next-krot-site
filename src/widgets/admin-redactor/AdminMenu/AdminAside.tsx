@@ -1,11 +1,12 @@
 "use client";
 
 import CloseIcon from "@icons/close-black.svg";
+import { AdminArticleTaxonomyPanel } from "@/widgets/admin-article-taxonomy";
 import AdminRedactorForm from "../AdminMenuService";
 
 interface AdminRedactorProps {
     onClose: () => void;
-    mode: "edit" | "create" | "delete";
+    mode: "edit" | "create" | "delete" | "articleTaxonomy";
 }
 
 const AdminAside = ({ onClose, mode }: AdminRedactorProps) => {
@@ -18,7 +19,11 @@ const AdminAside = ({ onClose, mode }: AdminRedactorProps) => {
                         alt="Закрыть"
                     />
                 </button>
-                <AdminRedactorForm mode={mode} onClose={onClose} />
+                {mode === "articleTaxonomy" ? (
+                    <AdminArticleTaxonomyPanel />
+                ) : (
+                    <AdminRedactorForm mode={mode} onClose={onClose} />
+                )}
             </div>
         </aside>
     );
