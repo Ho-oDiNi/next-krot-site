@@ -2,18 +2,14 @@ import crypto from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 
-const CATEGORY_IMAGES_PUBLIC_PATH = "/images";
-const DEFAULT_CATEGORY_IMAGES_DIR = path.join(
-    process.cwd(),
-    "public",
-    "images",
-);
+const PUBLIC_IMAGES_PATH = "/images";
+const DEFAULT_PUBLIC_IMAGES_DIR = path.join(process.cwd(), "public", "images");
 
-const resolveCategoryImagesDir = (): string => {
+const resolvePublicImagesDir = (): string => {
     const configuredDir = process.env.CATEGORY_IMAGES_DIR?.trim();
 
     if (!configuredDir) {
-        return DEFAULT_CATEGORY_IMAGES_DIR;
+        return DEFAULT_PUBLIC_IMAGES_DIR;
     }
 
     return path.isAbsolute(configuredDir)
@@ -21,13 +17,13 @@ const resolveCategoryImagesDir = (): string => {
         : path.resolve(process.cwd(), configuredDir);
 };
 
-const getCategoryImagesPublicPath = (): string =>
-    CATEGORY_IMAGES_PUBLIC_PATH.endsWith("/")
-        ? CATEGORY_IMAGES_PUBLIC_PATH.slice(0, -1)
-        : CATEGORY_IMAGES_PUBLIC_PATH;
+const getPublicImagesPath = (): string =>
+    PUBLIC_IMAGES_PATH.endsWith("/")
+        ? PUBLIC_IMAGES_PATH.slice(0, -1)
+        : PUBLIC_IMAGES_PATH;
 
-const ensureCategoryImagesDir = async (): Promise<void> => {
-    await fs.mkdir(resolveCategoryImagesDir(), { recursive: true });
+const ensurePublicImagesDir = async (): Promise<void> => {
+    await fs.mkdir(resolvePublicImagesDir(), { recursive: true });
 };
 
 const sanitizeFileBase = (fileName: string): string => {
@@ -38,11 +34,11 @@ const sanitizeFileBase = (fileName: string): string => {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
 
-    return sanitized || "category";
+    return sanitized || "image";
 };
 
-export const resolveCategoryImagePath = (publicUrl: string): string | null => {
-    const publicPath = getCategoryImagesPublicPath();
+export const resolvePublicImagePath = (publicUrl: string): string | null => {
+    const publicPath = getPublicImagesPath();
     const normalizedPublicUrl = publicUrl.startsWith("/")
         ? publicUrl
         : `/${publicUrl}`;
@@ -59,7 +55,7 @@ export const resolveCategoryImagePath = (publicUrl: string): string | null => {
         return null;
     }
 
-    const baseDir = resolveCategoryImagesDir();
+    const baseDir = resolvePublicImagesDir();
     const absolutePath = path.resolve(baseDir, relativePath);
     const normalizedBaseDir = baseDir.endsWith(path.sep)
         ? baseDir
@@ -72,18 +68,18 @@ export const resolveCategoryImagePath = (publicUrl: string): string | null => {
     return absolutePath;
 };
 
-export const saveCategoryImage = async (file: File): Promise<string> => {
-    await ensureCategoryImagesDir();
+export const savePublicImage = async (file: File): Promise<string> => {
+    await ensurePublicImagesDir();
 
     const extension = path.extname(file.name) || ".bin";
     const baseName = sanitizeFileBase(file.name);
     const fileName = `${baseName}-${Date.now()}-${crypto.randomUUID()}${extension}`;
-    const filePath = path.join(resolveCategoryImagesDir(), fileName);
+    const filePath = path.join(resolvePublicImagesDir(), fileName);
     const buffer = Buffer.from(await file.arrayBuffer());
 
     await fs.writeFile(filePath, buffer);
 
-    return `${getCategoryImagesPublicPath()}/${fileName}`;
+    return `${getPublicImagesPath()}/${fileName}`;
 };
 
 export const removePublicFile = async (
@@ -93,7 +89,7 @@ export const removePublicFile = async (
         return;
     }
 
-    const resolvedPath = resolveCategoryImagePath(publicUrl);
+    const resolvedPath = resolvePublicImagePath(publicUrl);
 
     if (!resolvedPath) {
         return;
@@ -107,3 +103,6 @@ export const removePublicFile = async (
         }
     }
 };
+
+export const resolveCategoryImagePath = resolvePublicImagePath;
+export const saveCategoryImage = savePublicImage;

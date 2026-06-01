@@ -14,7 +14,7 @@ export interface UpdateArticlePayload {
     title: string;
     previewImg: string | null;
     mainText: string;
-    readingTime: number | null;
+    previewImageFile?: File | null;
     isPublished: boolean;
 }
 
