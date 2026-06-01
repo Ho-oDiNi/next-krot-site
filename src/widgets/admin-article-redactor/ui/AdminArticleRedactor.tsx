@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation";
 
 import type { Author } from "@/entities/author";
 import type { Tag } from "@/entities/tag";
-import QuillEditor from "@/shared/lib/react-quill";
 import {
     PUBLIC_IMAGE_MAX_SIZE_BYTES,
     PUBLIC_IMAGE_MAX_SIZE_LABEL,
@@ -23,6 +22,8 @@ import type {
     ArticleRedactorFormData,
     UpdateArticleResult,
 } from "@/widgets/admin-article-redactor/model";
+import ArrowDownIcon from "@icons/arrow-down.svg";
+import QuillEditor from "@/shared/lib/react-quill";
 
 interface AdminArticleRedactorProps {
     article: ArticleRedactorFormData;
@@ -154,38 +155,38 @@ export const AdminArticleRedactor = ({
             />
 
             <div className="grid gap-6 rounded-3xl bg-white p-6 dark:bg-gray-900">
-                <div>
-                    <StyledTextarea
-                        id="article-title"
-                        label="Название"
-                        value={formData.title}
-                        onChange={(event) =>
-                            updateField("title", event.target.value)
-                        }
-                        required
-                        rows={2}
-                    />
+                <StyledTextarea
+                    id="article-title"
+                    label="Название"
+                    value={formData.title}
+                    onChange={(event) =>
+                        updateField("title", event.target.value)
+                    }
+                    required
+                    rows={2}
+                />
 
-                    <StyledInput
-                        id="article-slug"
-                        label="Slug"
-                        type="text"
-                        value={formData.slug}
-                        onChange={(event) =>
-                            updateField("slug", event.target.value)
-                        }
-                        required
-                    />
-                </div>
+                <StyledInput
+                    id="article-slug"
+                    label="Slug"
+                    type="text"
+                    value={formData.slug}
+                    onChange={(event) =>
+                        updateField("slug", event.target.value)
+                    }
+                    required
+                />
 
                 <div>
                     <label className="space-y-2 text-sm font-medium text-black dark:text-white">
-                        <span>Изображение превью</span>
+                        <span className="block text-gray-400">
+                            Изображение превью
+                        </span>
                         <input
                             type="file"
                             accept="image/*"
                             onChange={handlePreviewImageChange}
-                            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-black transition outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+                            className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-3 text-black transition outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
                         />
                         <span className="block text-xs text-gray-500 dark:text-gray-400">
                             {previewImageFile
@@ -195,32 +196,37 @@ export const AdminArticleRedactor = ({
                     </label>
                 </div>
 
-                <div className="grid gap-4 rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 dark:bg-gray-950 dark:text-gray-300">
+                <div className="grid gap-4 rounded-2xl bg-gray-50 text-sm text-gray-600 dark:bg-gray-900 dark:text-gray-300">
                     <label className="space-y-2">
                         <span className="block text-gray-400">Автор</span>
-                        <select
-                            value={formData.authorId}
-                            onChange={(event) =>
-                                updateField(
-                                    "authorId",
-                                    Number(event.target.value),
-                                )
-                            }
-                            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 font-medium text-black transition outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                            required
-                        >
-                            <option value="" disabled>
-                                Выберите автора
-                            </option>
-                            {authors.map((availableAuthor) => (
-                                <option
-                                    key={availableAuthor.id}
-                                    value={availableAuthor.id}
-                                >
-                                    {availableAuthor.name}
+                        <div className="relative">
+                            <select
+                                value={formData.authorId}
+                                onChange={(event) =>
+                                    updateField(
+                                        "authorId",
+                                        Number(event.target.value),
+                                    )
+                                }
+                                className="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-3 pr-11 font-medium text-black transition outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+                                required
+                            >
+                                <option value="" disabled>
+                                    Выберите автора
                                 </option>
-                            ))}
-                        </select>
+
+                                {authors.map((availableAuthor) => (
+                                    <option
+                                        key={availableAuthor.id}
+                                        value={availableAuthor.id}
+                                    >
+                                        {availableAuthor.name}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <ArrowDownIcon className="pointer-events-none absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-gray-500 dark:text-gray-300" />
+                        </div>
                     </label>
 
                     <div className="space-y-2">
@@ -248,14 +254,11 @@ export const AdminArticleRedactor = ({
                                             }
                                             className="sr-only"
                                         />
-                                        #{tag.name}
+                                        {tag.name}
                                     </label>
                                 );
                             })}
                         </div>
-                        <span className="block text-xs text-gray-400">
-                            {selectedTagList || "Без тем"}
-                        </span>
                     </div>
                 </div>
 
