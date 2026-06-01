@@ -11,7 +11,7 @@
 }
 
 .input {
-  @apply border-brand-dark focus:border-brand-dark text-brand-dark w-full rounded-2xl border-2 bg-white p-4 text-base leading-6 transition outline-none;
+  @apply w-full rounded-2xl border-2 border-gray-300 bg-white p-4 text-base leading-6 text-neutral-700 transition outline-none focus:border-neutral-500;
 }
 
 .label,
@@ -55,7 +55,7 @@
 }
 
 .iconButton:hover {
-  @apply text-brand-dark;
+  @apply text-neutral-700;
 }
 
 .nativePickerInput {
@@ -67,7 +67,7 @@
 }
 
 .errorText {
-  @apply font-roboto absolute ml-2 text-base text-red-500 md:mt-2;
+  @apply absolute ml-2 text-base text-red-500 md:mt-2;
 }
 
 .textarea {

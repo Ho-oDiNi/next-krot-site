@@ -7,8 +7,8 @@ import prisma from "@/shared/lib/prisma";
 import { Category } from "@/entities/category";
 import { isAdminServerSide } from "@/core/auth";
 import {
-    CATEGORY_IMAGE_MAX_SIZE_BYTES,
-    CATEGORY_IMAGE_MAX_SIZE_LABEL,
+    PUBLIC_IMAGE_MAX_SIZE_BYTES,
+    PUBLIC_IMAGE_MAX_SIZE_LABEL,
     saveCategoryImage,
     removePublicFile,
 } from "@/shared/lib/file-storage";
@@ -61,9 +61,9 @@ export const createServiceCategory = async (
         let imageUrl: string | undefined;
 
         if (imageFile && imageFile.size > 0) {
-            if (imageFile.size > CATEGORY_IMAGE_MAX_SIZE_BYTES) {
+            if (imageFile.size > PUBLIC_IMAGE_MAX_SIZE_BYTES) {
                 throw new Error(
-                    `Размер изображения не должен превышать ${CATEGORY_IMAGE_MAX_SIZE_LABEL}`,
+                    `Размер изображения не должен превышать ${PUBLIC_IMAGE_MAX_SIZE_LABEL}`,
                 );
             }
 

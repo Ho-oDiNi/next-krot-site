@@ -9,8 +9,8 @@ import {
     CategoryCreateResult,
 } from "@/widgets/admin-redactor/model/adminRedactor.types";
 import {
-    CATEGORY_IMAGE_MAX_SIZE_BYTES,
-    CATEGORY_IMAGE_MAX_SIZE_LABEL,
+    PUBLIC_IMAGE_MAX_SIZE_BYTES,
+    PUBLIC_IMAGE_MAX_SIZE_LABEL,
 } from "@/shared/lib/file-storage/config";
 
 type CategoryFormState = {
@@ -42,10 +42,10 @@ const CategoryCreateView = ({
             return;
         }
 
-        if (file.size > CATEGORY_IMAGE_MAX_SIZE_BYTES) {
+        if (file.size > PUBLIC_IMAGE_MAX_SIZE_BYTES) {
             setStatus({
                 success: false,
-                message: `Размер изображения не должен превышать ${CATEGORY_IMAGE_MAX_SIZE_LABEL}`,
+                message: `Размер изображения не должен превышать ${PUBLIC_IMAGE_MAX_SIZE_LABEL}`,
             });
             setImageFile(null);
             return;

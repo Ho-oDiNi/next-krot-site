@@ -136,7 +136,7 @@ export const AdminArticleRedactor = ({
             />
 
             <div className="grid gap-6 rounded-3xl bg-white p-6 dark:bg-gray-900">
-                <div className="grid gap-4 md:grid-cols-2">
+                <div>
                     <StyledTextarea
                         id="article-title"
                         label="Название"
@@ -172,9 +172,7 @@ export const AdminArticleRedactor = ({
                         <span className="block text-xs text-gray-500 dark:text-gray-400">
                             {previewImageFile
                                 ? previewImageFile.name
-                                : formData.previewImg
-                                  ? `Текущее изображение: ${formData.previewImg}`
-                                  : "Необязательное поле"}
+                                : formData.previewImg}
                         </span>
                     </label>
 
@@ -184,10 +182,6 @@ export const AdminArticleRedactor = ({
                         </span>
                         <span className="font-medium text-black dark:text-white">
                             {calculatedReadingTime} мин.
-                        </span>
-                        <span className="block text-xs text-gray-500 dark:text-gray-400">
-                            Рассчитывается при сохранении: символы основного
-                            текста / 1400.
                         </span>
                     </div>
                 </div>
@@ -228,21 +222,20 @@ export const AdminArticleRedactor = ({
                 </label>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex-between flex-wrap gap-3">
+                <button
+                    type="button"
+                    onClick={() => router.push("/admin")}
+                    className="rounded-full border border-gray-300 bg-slate-100 px-8 py-4 text-sm font-semibold text-black transition hover:border-gray-500 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
+                >
+                    Вернуться в админку
+                </button>
                 <button
                     type="submit"
                     disabled={isPending}
                     className="rounded-full bg-gray-900 px-8 py-4 text-sm font-semibold text-white transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black"
                 >
                     {isPending ? "Сохранение..." : "Сохранить статью"}
-                </button>
-
-                <button
-                    type="button"
-                    onClick={() => router.push("/admin")}
-                    className="rounded-full border border-gray-300 px-8 py-4 text-sm font-semibold text-black transition hover:border-gray-500 dark:border-gray-700 dark:text-white"
-                >
-                    Вернуться в админку
                 </button>
             </div>
         </form>
