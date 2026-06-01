@@ -4,6 +4,12 @@ import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import { isAdminServerSide } from "@/core/auth";
+import {
+    PUBLIC_IMAGE_MAX_SIZE_BYTES,
+    PUBLIC_IMAGE_MAX_SIZE_LABEL,
+    removePublicFile,
+    savePublicImage,
+} from "@/shared/lib/file-storage";
 import { logger } from "@/shared/lib/logger";
 import prisma from "@/shared/lib/prisma";
 import type {
@@ -28,13 +34,29 @@ const requiredString = (value: string | undefined, message: string) => {
     return trimmedValue;
 };
 
-const normalizeTaxonomyPayload = (payload: ArticleTaxonomyFormData) => ({
-    id: payload.id,
-    name: requiredString(payload.name, "Название обязательно"),
-    slug: requiredString(payload.slug, "Slug обязателен"),
-    description: payload.description?.trim() ?? "",
-    avatarImg: payload.avatarImg?.trim() || null,
-});
+const getAvatarImageFile = (payload: ArticleTaxonomyFormData) =>
+    typeof File !== "undefined" && payload.avatarImageFile instanceof File
+        ? payload.avatarImageFile
+        : null;
+
+const normalizeTaxonomyPayload = (payload: ArticleTaxonomyFormData) => {
+    const avatarImageFile = getAvatarImageFile(payload);
+
+    if (avatarImageFile && avatarImageFile.size > PUBLIC_IMAGE_MAX_SIZE_BYTES) {
+        throw new Error(
+            `Размер изображения не должен превышать ${PUBLIC_IMAGE_MAX_SIZE_LABEL}`,
+        );
+    }
+
+    return {
+        id: payload.id,
+        name: requiredString(payload.name, "Название обязательно"),
+        slug: requiredString(payload.slug, "Slug обязателен"),
+        description: payload.description?.trim() ?? "",
+        avatarImg: payload.avatarImg?.trim() || null,
+        avatarImageFile,
+    };
+};
 
 const ensureAdmin = async () => {
     const isAdmin = await isAdminServerSide();
@@ -69,15 +91,22 @@ const getPrismaErrorMessage = (error: unknown, fallbackMessage: string) => {
 export const createArticleAuthor = async (
     payload: ArticleTaxonomyFormData,
 ): Promise<ArticleTaxonomyResult> => {
+    let uploadedAvatarUrl: string | undefined;
+
     try {
         await ensureAdmin();
         const data = normalizeTaxonomyPayload(payload);
+
+        if (data.avatarImageFile && data.avatarImageFile.size > 0) {
+            uploadedAvatarUrl = await savePublicImage(data.avatarImageFile);
+        }
+
         const author = await prisma.author.create({
             data: {
                 name: data.name,
                 slug: data.slug,
                 description: data.description,
-                avatarImg: data.avatarImg,
+                avatarImg: uploadedAvatarUrl ?? data.avatarImg,
             },
         });
 
@@ -89,6 +118,10 @@ export const createArticleAuthor = async (
             author,
         };
     } catch (error) {
+        if (uploadedAvatarUrl) {
+            await removePublicFile(uploadedAvatarUrl);
+        }
+
         logger.error("Ошибка при добавлении автора статьи", { error, payload });
 
         return {
@@ -101,6 +134,8 @@ export const createArticleAuthor = async (
 export const updateArticleAuthor = async (
     payload: ArticleTaxonomyFormData,
 ): Promise<ArticleTaxonomyResult> => {
+    let uploadedAvatarUrl: string | undefined;
+
     try {
         await ensureAdmin();
         const data = normalizeTaxonomyPayload(payload);
@@ -109,18 +144,39 @@ export const updateArticleAuthor = async (
             throw new Error("Не найден автор для обновления");
         }
 
+        const existingAuthor = await prisma.author.findUnique({
+            where: { id: data.id },
+            select: { avatarImg: true, slug: true },
+        });
+
+        if (!existingAuthor) {
+            throw new Error("Автор не найден");
+        }
+
+        if (data.avatarImageFile && data.avatarImageFile.size > 0) {
+            uploadedAvatarUrl = await savePublicImage(data.avatarImageFile);
+        }
+
         const author = await prisma.author.update({
             where: { id: data.id },
             data: {
                 name: data.name,
                 slug: data.slug,
                 description: data.description,
-                avatarImg: data.avatarImg,
+                avatarImg: uploadedAvatarUrl ?? existingAuthor.avatarImg,
             },
         });
 
+        if (uploadedAvatarUrl && existingAuthor.avatarImg) {
+            await removePublicFile(existingAuthor.avatarImg);
+        }
+
         revalidateArticleTaxonomy();
         revalidatePath(`/author/${author.slug}`);
+
+        if (existingAuthor.slug !== author.slug) {
+            revalidatePath(`/author/${existingAuthor.slug}`);
+        }
 
         return {
             success: true,
@@ -128,6 +184,10 @@ export const updateArticleAuthor = async (
             author,
         };
     } catch (error) {
+        if (uploadedAvatarUrl) {
+            await removePublicFile(uploadedAvatarUrl);
+        }
+
         logger.error("Ошибка при обновлении автора статьи", { error, payload });
 
         return {
@@ -143,6 +203,8 @@ export const deleteArticleAuthor = async (
     try {
         await ensureAdmin();
         const author = await prisma.author.delete({ where: { id } });
+
+        await removePublicFile(author.avatarImg);
 
         revalidateArticleTaxonomy();
         revalidatePath(`/author/${author.slug}`);

@@ -9,6 +9,7 @@ export interface ArticleTaxonomyFormData {
     slug: string;
     description?: string;
     avatarImg?: string;
+    avatarImageFile?: File | null;
 }
 
 export interface ArticleTaxonomyResult {

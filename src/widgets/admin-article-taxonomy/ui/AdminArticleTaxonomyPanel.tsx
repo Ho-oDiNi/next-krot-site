@@ -1,10 +1,21 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState, useTransition } from "react";
+import {
+    ChangeEvent,
+    FormEvent,
+    useEffect,
+    useMemo,
+    useState,
+    useTransition,
+} from "react";
 import { useRouter } from "next/navigation";
 
 import type { Author } from "@/entities/author";
 import type { Tag } from "@/entities/tag";
+import {
+    PUBLIC_IMAGE_MAX_SIZE_BYTES,
+    PUBLIC_IMAGE_MAX_SIZE_LABEL,
+} from "@/shared/lib/file-storage/config";
 import StatusMessage from "@/shared/ui/StatusMessage";
 import { StyledInput, StyledTextarea } from "@/shared/ui/StyledInput";
 import {
@@ -47,6 +58,7 @@ export const AdminArticleTaxonomyPanel = () => {
     const [formData, setFormData] =
         useState<ArticleTaxonomyFormData>(EMPTY_FORM);
     const [isFormVisible, setIsFormVisible] = useState(false);
+    const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
     const [status, setStatus] = useState<ArticleTaxonomyResult | null>(null);
     const [isPending, startTransition] = useTransition();
 
@@ -89,6 +101,7 @@ export const AdminArticleTaxonomyPanel = () => {
 
     const resetForm = () => {
         setFormData(EMPTY_FORM);
+        setIsSlugManuallyEdited(false);
         setIsFormVisible(false);
     };
 
@@ -100,10 +113,37 @@ export const AdminArticleTaxonomyPanel = () => {
             ...prev,
             [field]: value,
             slug:
-                field === "name" && !prev.id && !prev.slug
+                field === "name" && !prev.id && !isSlugManuallyEdited
                     ? createSlug(String(value))
                     : prev.slug,
         }));
+    };
+
+    const handleSlugChange = (value: string) => {
+        setIsSlugManuallyEdited(true);
+        updateFormField("slug", value);
+    };
+
+    const handleAvatarImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const avatarImageFile = event.target.files?.[0] ?? null;
+
+        if (!avatarImageFile) {
+            updateFormField("avatarImageFile", null);
+            return;
+        }
+
+        if (avatarImageFile.size > PUBLIC_IMAGE_MAX_SIZE_BYTES) {
+            setStatus({
+                success: false,
+                message: `Размер изображения не должен превышать ${PUBLIC_IMAGE_MAX_SIZE_LABEL}`,
+            });
+            updateFormField("avatarImageFile", null);
+            event.target.value = "";
+            return;
+        }
+
+        setStatus(null);
+        updateFormField("avatarImageFile", avatarImageFile);
     };
 
     const handleEntityChange = (entity: ArticleTaxonomyEntity) => {
@@ -114,18 +154,21 @@ export const AdminArticleTaxonomyPanel = () => {
 
     const handleAdd = () => {
         setStatus(null);
+        setIsSlugManuallyEdited(false);
         setFormData(EMPTY_FORM);
         setIsFormVisible(true);
     };
 
     const handleEdit = (item: Author | Tag) => {
         setStatus(null);
+        setIsSlugManuallyEdited(true);
         setFormData({
             id: item.id,
             name: item.name,
             slug: item.slug,
             description: "description" in item ? item.description : "",
             avatarImg: "avatarImg" in item ? (item.avatarImg ?? "") : "",
+            avatarImageFile: null,
         });
         setIsFormVisible(true);
     };
@@ -281,7 +324,7 @@ export const AdminArticleTaxonomyPanel = () => {
                         type="text"
                         value={formData.slug}
                         onChange={(event) =>
-                            updateFormField("slug", event.target.value)
+                            handleSlugChange(event.target.value)
                         }
                         required
                     />
@@ -301,18 +344,25 @@ export const AdminArticleTaxonomyPanel = () => {
                                 rows={3}
                                 required
                             />
-                            <StyledInput
-                                id="article-taxonomy-avatar"
-                                label="URL аватара"
-                                type="text"
-                                value={formData.avatarImg ?? ""}
-                                onChange={(event) =>
-                                    updateFormField(
-                                        "avatarImg",
-                                        event.target.value,
-                                    )
-                                }
-                            />
+                            <label className="space-y-2 text-sm font-medium text-black dark:text-white">
+                                <span className="block text-slate-500 dark:text-slate-400">
+                                    Аватар
+                                </span>
+
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarImageChange}
+                                    className="w-full cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 text-black transition outline-none focus:border-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                                />
+
+                                <span className="block truncate text-xs text-slate-500 dark:text-slate-400">
+                                    {formData.avatarImageFile
+                                        ? formData.avatarImageFile.name
+                                        : formData.avatarImg ||
+                                          "Файл не выбран"}
+                                </span>
+                            </label>
                         </>
                     ) : null}
 
