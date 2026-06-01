@@ -2,8 +2,8 @@ import crypto from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 
-const PUBLIC_IMAGES_PATH = "/images";
-const DEFAULT_PUBLIC_IMAGES_DIR = path.join(process.cwd(), "public", "images");
+const PUBLIC_IMAGES_PATH = "/upload";
+const DEFAULT_PUBLIC_IMAGES_DIR = path.join(process.cwd(), "public", "upload");
 
 const resolvePublicImagesDir = (): string => {
     const configuredDir = process.env.CATEGORY_IMAGES_DIR?.trim();
