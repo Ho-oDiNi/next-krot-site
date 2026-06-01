@@ -50,17 +50,12 @@ const ArticleDeletePanel = ({
     };
 
     return (
-        <div className="space-y-5 p-8 pt-14 text-black dark:text-white">
-            <div>
-                <p className="text-sm font-semibold text-red-500 uppercase">
-                    Удаление статьи
-                </p>
-                <h2 className="text-2xl font-bold">
-                    {articleSlug
-                        ? `Удалить статью «${articleSlug}»?`
-                        : "Статья не выбрана"}
-                </h2>
-            </div>
+        <div className="space-y-5 p-8 pt-5 text-black dark:text-white">
+            <h2 className="text-2xl font-bold">
+                {articleSlug
+                    ? `Удалить статью «${articleSlug}»?`
+                    : "Статья не выбрана"}
+            </h2>
 
             <StatusMessage
                 message={status?.message}
@@ -72,7 +67,14 @@ const ArticleDeletePanel = ({
                 публичного раздела.
             </p>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex-between flex-wrap gap-3">
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-100"
+                >
+                    Отмена
+                </button>
                 <button
                     type="button"
                     onClick={handleDelete}
@@ -80,13 +82,6 @@ const ArticleDeletePanel = ({
                     className="rounded-full bg-red-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {isPending ? "Удаление..." : "Удалить статью"}
-                </button>
-                <button
-                    type="button"
-                    onClick={onClose}
-                    className="rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-100"
-                >
-                    Отмена
                 </button>
             </div>
         </div>

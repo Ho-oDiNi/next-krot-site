@@ -17,7 +17,7 @@ export const HeaderNavigation = async ({
             ))}
             {isAdmin && (
                 <Link href="/admin" className="text-sm">
-                    Админка
+                    Панель управления
                 </Link>
             )}
         </nav>

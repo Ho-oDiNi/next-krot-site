@@ -1,6 +1,4 @@
-@reference "tailwindcss";
-@reference "#styles/_theme.css";
-@reference "#styles/_utility.css";
+@reference "#app/globals.css";
 
 .wrapper {
   @apply relative max-h-15;
@@ -14,9 +12,22 @@
   @apply w-full rounded-2xl border-2 border-gray-300 bg-white p-4 text-base leading-6 text-neutral-700 transition outline-none focus:border-neutral-500;
 }
 
+:global(.dark) .input {
+  @apply border-gray-700 bg-gray-950 text-white;
+}
+
+:global(.dark) .input:focus {
+  @apply border-gray-400;
+}
+
 .label,
 .labelTextarea {
   @apply pointer-events-none absolute left-4 text-base text-gray-400 transition-all;
+}
+
+:global(.dark) .label,
+:global(.dark) .labelTextarea {
+  @apply text-gray-500;
 }
 
 .label {
@@ -34,42 +45,25 @@
   @apply top-0 translate-y-0 text-sm;
 }
 
-.pickerInput {
-  @apply pr-12;
-}
-
-.ghost {
-  @apply pointer-events-none absolute inset-y-0 right-12 left-4.5 flex items-center text-base leading-6;
-}
-
-.ghostTyped {
-  @apply invisible whitespace-pre;
-}
-
-.ghostRest {
-  @apply whitespace-pre text-neutral-400;
-}
-
-.iconButton {
-  @apply absolute top-1/2 right-4 z-10 -translate-y-1/2 cursor-pointer text-neutral-500 transition;
-}
-
-.iconButton:hover {
-  @apply text-neutral-700;
-}
-
-.nativePickerInput {
-  @apply pointer-events-none absolute inset-0 opacity-0;
+:global(.dark) .input:focus + .label,
+:global(.dark) .input:not(:placeholder-shown) + .label,
+:global(.dark) .input:focus + .labelTextarea,
+:global(.dark) .input:not(:placeholder-shown) + .labelTextarea {
+  @apply text-gray-400;
 }
 
 .inputError {
   @apply border-red-500 bg-red-50 focus:border-red-500;
 }
 
+:global(.dark) .inputError {
+  @apply border-red-500 bg-red-950/40 text-red-100 focus:border-red-500;
+}
+
 .errorText {
   @apply absolute ml-2 text-base text-red-500 md:mt-2;
 }
 
-.textarea {
-  @apply no-scrollbar resize-y;
+:global(.dark) .errorText {
+  @apply text-red-400;
 }

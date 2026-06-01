@@ -12,7 +12,7 @@ interface AdminButtonProps {
 }
 
 const buttonClassName =
-    "relative flex size-10 items-center justify-center rounded-full bg-white transition hover:bg-slate-300 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-slate-700";
+    "relative flex size-10 items-center justify-center rounded-full bg-white transition hover:bg-slate-300 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-slate-700 [&_svg]:size-6 [&_svg]:shrink-0";
 
 const AdminButton = ({
     onClick,

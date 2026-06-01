@@ -154,11 +154,6 @@ export const AdminArticleRedactor = ({
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
-            <StatusMessage
-                message={status?.message}
-                success={status?.success}
-            />
-
             <div className="grid gap-6 rounded-3xl bg-white p-6 dark:bg-gray-900">
                 <div className="grid gap-4 rounded-2xl bg-gray-50 text-sm text-gray-600 dark:bg-gray-900 dark:text-gray-300">
                     <label className="space-y-2">
@@ -280,6 +275,11 @@ export const AdminArticleRedactor = ({
                     />
                 </div>
             </div>
+
+            <StatusMessage
+                message={status?.message}
+                success={status?.success}
+            />
 
             <div className="flex-between flex-wrap gap-3">
                 <button

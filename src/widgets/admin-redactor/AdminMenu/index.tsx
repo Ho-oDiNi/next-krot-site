@@ -18,7 +18,11 @@ const AdminRedactor = () => {
     const [redactorMode, setRedactorMode] = useState<AdminAsideMode | null>(
         null,
     );
+
     const pathname = usePathname();
+
+    const isAdminPath = pathname?.startsWith("/admin");
+
     const editedArticleSlug = useMemo(
         () => getEditedArticleSlug(pathname),
         [pathname],
@@ -40,6 +44,10 @@ const AdminRedactor = () => {
     const handleClose = () => {
         setRedactorMode(null);
     };
+
+    if (!isAdminPath) {
+        return null;
+    }
 
     return (
         <>

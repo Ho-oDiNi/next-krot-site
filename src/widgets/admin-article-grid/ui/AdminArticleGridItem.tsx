@@ -18,7 +18,7 @@ export const AdminArticleGridItem = ({
     const tagList = article.tags.map((tag) => `#${tag.name}`).join(" / ");
 
     return (
-        <article className="flex items-center gap-4 border-b border-slate-200 py-5 last:border-b-0 sm:gap-6 dark:border-slate-800">
+        <article className="flex items-center gap-4 rounded-2xl border-slate-200 bg-white p-4 sm:gap-6 dark:border-slate-800 dark:bg-slate-900">
             <div className="flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded-md bg-slate-100 sm:h-20 sm:w-32 dark:bg-slate-800">
                 {article.previewImg ? (
                     <Image
@@ -38,8 +38,8 @@ export const AdminArticleGridItem = ({
                     {article.title}
                 </h2>
 
-                <p className="mt-1 text-sm leading-tight text-slate-400 sm:text-lg">
-                    By {article.author.name} -{" "}
+                <p className="mt-1 text-xs leading-tight text-slate-400 sm:text-sm">
+                    {article.author.name} -{" "}
                     {article.updatedAt.toLocaleDateString("ru-RU", {
                         day: "numeric",
                         month: "long",

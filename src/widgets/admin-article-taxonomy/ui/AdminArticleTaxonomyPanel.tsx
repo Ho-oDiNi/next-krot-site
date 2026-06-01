@@ -214,14 +214,7 @@ export const AdminArticleTaxonomyPanel = () => {
     };
 
     return (
-        <div className="space-y-5 p-6 pt-14 text-black dark:text-white">
-            <div>
-                <p className="text-sm font-semibold text-slate-500 uppercase dark:text-slate-400">
-                    Справочники статей
-                </p>
-                <h2 className="text-2xl font-bold">Авторы и темы</h2>
-            </div>
-
+        <div className="space-y-5 p-6 pt-4 text-black dark:text-white">
             <div className="grid grid-cols-2 gap-2 rounded-full bg-slate-200 p-1 dark:bg-slate-800">
                 <button
                     type="button"
@@ -247,15 +240,7 @@ export const AdminArticleTaxonomyPanel = () => {
                 </button>
             </div>
 
-            <StatusMessage
-                message={status?.message}
-                success={status?.success}
-            />
-
-            <form
-                onSubmit={handleSubmit}
-                className="space-y-3 rounded-2xl bg-white p-4 dark:bg-slate-900"
-            >
+            <form onSubmit={handleSubmit} className="space-y-3 rounded-2xl">
                 <h3 className="font-semibold">
                     {formData.id ? "Редактировать" : "Добавить"}{" "}
                     {getEntityTitle(activeEntity)}
@@ -329,6 +314,11 @@ export const AdminArticleTaxonomyPanel = () => {
                 </div>
             </form>
 
+            <StatusMessage
+                message={status?.message}
+                success={status?.success}
+            />
+
             <div className="space-y-2">
                 <h3 className="font-semibold">Список</h3>
                 <div className="space-y-2">
@@ -339,7 +329,7 @@ export const AdminArticleTaxonomyPanel = () => {
                         >
                             <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
-                                    <p className="font-semibold text-slate-950 dark:text-white">
+                                    <p className="text-xs font-semibold text-slate-950 lg:text-base dark:text-white">
                                         {item.name}
                                     </p>
                                     <p className="truncate text-xs text-slate-500">

@@ -1,3 +1,9 @@
+.dark .ql-editor.ql-blank::before {
+  color: white;
+  opacity: 1;
+  font-style: normal;
+}
+
 .ql-editor {
   display: flex;
   flex-direction: column;

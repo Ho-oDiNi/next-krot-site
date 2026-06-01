@@ -18,17 +18,14 @@ const AdminAside = ({
     articleSlug = null,
 }: AdminRedactorProps) => {
     return (
-        <aside className="fixed top-20 right-4 left-4 z-[99] lg:left-auto lg:w-1/3">
+        <aside className="fixed top-20 right-4 left-4 z-99 lg:left-auto lg:w-1/3">
             <div className="no-scrollbar max-h-[85vh] overflow-y-auto rounded-2xl border-2 border-black bg-slate-50 inset-shadow-sm/30 dark:border-slate-700 dark:bg-slate-950">
                 <button
                     type="button"
                     onClick={onClose}
                     aria-label="Закрыть панель"
                 >
-                    <CloseIcon
-                        className="absolute top-5 right-5 h-10 w-10 rounded-full"
-                        alt="Закрыть"
-                    />
+                    <CloseIcon className="absolute top-5 right-5 z-100 size-5 rounded-full text-black dark:text-white" />
                 </button>
                 {mode === "articleTaxonomy" ? (
                     <AdminArticleTaxonomyPanel />

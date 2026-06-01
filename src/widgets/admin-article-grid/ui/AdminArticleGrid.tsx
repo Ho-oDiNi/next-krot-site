@@ -19,7 +19,7 @@ export const AdminArticleGrid = async () => {
     }
 
     return (
-        <div className="w-full">
+        <div className="w-full space-y-2">
             {articles.map((article) => (
                 <AdminArticleGridItem key={article.id} article={article} />
             ))}
