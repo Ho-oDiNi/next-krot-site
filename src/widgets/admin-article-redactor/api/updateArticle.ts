@@ -38,6 +38,7 @@ const normalizeArticlePayload = (payload: UpdateArticlePayload) => {
     const title = payload.title.trim();
     const mainText = payload.mainText.trim();
     const previewImageFile = getArticlePreviewImageFile(payload);
+    const uniqueTagIds = Array.from(new Set(payload.tagIds));
 
     if (!payload.originalSlug.trim()) {
         throw new Error("Не найден исходный slug статьи");
@@ -53,6 +54,10 @@ const normalizeArticlePayload = (payload: UpdateArticlePayload) => {
 
     if (!mainText) {
         throw new Error("Текст статьи обязателен");
+    }
+
+    if (!payload.authorId) {
+        throw new Error("Выберите автора статьи");
     }
 
     if (
@@ -73,6 +78,10 @@ const normalizeArticlePayload = (payload: UpdateArticlePayload) => {
             mainText,
             readingTime: calculateReadingTime(mainText),
             isPublished: payload.isPublished,
+            authorId: payload.authorId,
+            tags: {
+                set: uniqueTagIds.map((id) => ({ id })),
+            },
         },
         previewImageFile,
     };

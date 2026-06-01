@@ -26,14 +26,14 @@ import type {
 
 interface AdminArticleRedactorProps {
     article: ArticleRedactorFormData;
-    author: Author;
-    tags: Tag[];
+    authors: Author[];
+    availableTags: Tag[];
 }
 
 export const AdminArticleRedactor = ({
     article,
-    author,
-    tags,
+    authors,
+    availableTags,
 }: AdminArticleRedactorProps) => {
     const router = useRouter();
     const [formData, setFormData] = useState<ArticleRedactorFormData>(article);
@@ -41,9 +41,13 @@ export const AdminArticleRedactor = ({
     const [previewImageFile, setPreviewImageFile] = useState<File | null>(null);
     const [isPending, startTransition] = useTransition();
 
-    const tagList = useMemo(
-        () => tags.map((tag) => `#${tag.name}`).join(" / "),
-        [tags],
+    const selectedTagList = useMemo(
+        () =>
+            availableTags
+                .filter((tag) => formData.tagIds.includes(tag.id))
+                .map((tag) => `#${tag.name}`)
+                .join(" / "),
+        [availableTags, formData.tagIds],
     );
 
     const updateField = <K extends keyof ArticleRedactorFormData>(
@@ -92,6 +96,8 @@ export const AdminArticleRedactor = ({
                         previewImageFile,
                         mainText: formData.mainText,
                         isPublished,
+                        authorId: formData.authorId,
+                        tagIds: formData.tagIds,
                     });
 
                     setStatus(result);
@@ -129,6 +135,15 @@ export const AdminArticleRedactor = ({
 
     const handlePublicationToggle = () => {
         saveArticle(!formData.isPublished);
+    };
+
+    const handleTagToggle = (tagId: number) => {
+        setFormData((prev) => ({
+            ...prev,
+            tagIds: prev.tagIds.includes(tagId)
+                ? prev.tagIds.filter((selectedTagId) => selectedTagId !== tagId)
+                : [...prev.tagIds, tagId],
+        }));
     };
 
     return (
@@ -180,17 +195,66 @@ export const AdminArticleRedactor = ({
                     </label>
                 </div>
 
-                <div className="grid gap-4 rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 md:grid-cols-2 dark:bg-gray-950 dark:text-gray-300">
-                    <div>
+                <div className="grid gap-4 rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 dark:bg-gray-950 dark:text-gray-300">
+                    <label className="space-y-2">
                         <span className="block text-gray-400">Автор</span>
-                        <span className="font-medium text-black dark:text-white">
-                            {author.name}
-                        </span>
-                    </div>
-                    <div>
+                        <select
+                            value={formData.authorId}
+                            onChange={(event) =>
+                                updateField(
+                                    "authorId",
+                                    Number(event.target.value),
+                                )
+                            }
+                            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 font-medium text-black transition outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                            required
+                        >
+                            <option value="" disabled>
+                                Выберите автора
+                            </option>
+                            {authors.map((availableAuthor) => (
+                                <option
+                                    key={availableAuthor.id}
+                                    value={availableAuthor.id}
+                                >
+                                    {availableAuthor.name}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <div className="space-y-2">
                         <span className="block text-gray-400">Темы</span>
-                        <span className="font-medium text-black dark:text-white">
-                            {tagList || "Без тем"}
+                        <div className="flex flex-wrap gap-2">
+                            {availableTags.map((tag) => {
+                                const isSelected = formData.tagIds.includes(
+                                    tag.id,
+                                );
+
+                                return (
+                                    <label
+                                        key={tag.id}
+                                        className={`cursor-pointer rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                                            isSelected
+                                                ? "border-slate-950 bg-slate-950 text-white dark:border-white dark:bg-white dark:text-black"
+                                                : "border-gray-200 bg-white text-gray-600 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                                        }`}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() =>
+                                                handleTagToggle(tag.id)
+                                            }
+                                            className="sr-only"
+                                        />
+                                        #{tag.name}
+                                    </label>
+                                );
+                            })}
+                        </div>
+                        <span className="block text-xs text-gray-400">
+                            {selectedTagList || "Без тем"}
                         </span>
                     </div>
                 </div>

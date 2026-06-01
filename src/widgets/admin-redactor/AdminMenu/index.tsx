@@ -8,7 +8,7 @@ import AdminMenu from "./AdminMenu";
 
 const AdminRedactor = () => {
     const [redactorMode, setRedactorMode] = useState<
-        "edit" | "create" | "delete" | null
+        "edit" | "create" | "delete" | "articleTaxonomy" | null
     >(null);
     const pathname = usePathname();
 
@@ -21,12 +21,12 @@ const AdminRedactor = () => {
         setRedactorMode("create");
     };
 
-    const handleOpenEdit = () => {
-        setRedactorMode("edit");
-    };
-
     const handleOpenDelete = () => {
         setRedactorMode("delete");
+    };
+
+    const handleOpenArticleTaxonomy = () => {
+        setRedactorMode("articleTaxonomy");
     };
 
     const handleClose = () => {
@@ -39,9 +39,9 @@ const AdminRedactor = () => {
                 <AdminAside mode={redactorMode} onClose={handleClose} />
             ) : (
                 <AdminMenu
-                    onPencil={handleOpenEdit}
                     onPlus={handleOpenCreate}
                     onDelete={handleOpenDelete}
+                    onSettings={handleOpenArticleTaxonomy}
                 />
             )}
         </>

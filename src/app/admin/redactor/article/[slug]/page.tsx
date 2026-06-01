@@ -1,4 +1,6 @@
 import { getArticleBySlug } from "@/entities/article/api";
+import { getAuthors } from "@/entities/author/api";
+import { getTags } from "@/entities/tag/api";
 import { cn } from "@/shared/lib/cn";
 import { AdminArticleRedactor } from "@/widgets/admin-article-redactor";
 import { notFound } from "next/navigation";
@@ -13,7 +15,11 @@ const AdminArticleRedactorPage = async ({
     params,
 }: AdminArticleRedactorPageProps) => {
     const { slug } = await params;
-    const article = await getArticleBySlug(slug);
+    const [article, authors, availableTags] = await Promise.all([
+        getArticleBySlug(slug),
+        getAuthors(),
+        getTags(),
+    ]);
 
     if (!article) {
         notFound();
@@ -38,9 +44,11 @@ const AdminArticleRedactorPage = async ({
                     mainText: article.mainText,
                     readingTime: article.readingTime?.toString() ?? "",
                     isPublished: article.isPublished,
+                    authorId: article.author.id,
+                    tagIds: article.tags.map((tag) => tag.id),
                 }}
-                author={article.author}
-                tags={article.tags}
+                authors={authors}
+                availableTags={availableTags}
             />
         </section>
     );
