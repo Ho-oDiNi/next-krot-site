@@ -1,6 +1,12 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useState, useTransition } from "react";
+import {
+    ChangeEvent,
+    FormEvent,
+    useCallback,
+    useState,
+    useTransition,
+} from "react";
 import { useRouter } from "next/navigation";
 
 import type { Author } from "@/entities/author";
@@ -9,6 +15,7 @@ import {
     PUBLIC_IMAGE_MAX_SIZE_BYTES,
     PUBLIC_IMAGE_MAX_SIZE_LABEL,
 } from "@/shared/lib/file-storage/config";
+import QuillEditor from "@/shared/lib/react-quill";
 import StatusMessage from "@/shared/ui/StatusMessage";
 import { StyledInput, StyledTextarea } from "@/shared/ui/StyledInput";
 import { updateArticle } from "@/widgets/admin-article-redactor/api/updateArticle";
@@ -16,8 +23,8 @@ import type {
     ArticleRedactorFormData,
     UpdateArticleResult,
 } from "@/widgets/admin-article-redactor/model";
+
 import ArrowDownIcon from "@icons/arrow-down.svg";
-import QuillEditor from "@/shared/lib/react-quill";
 
 interface AdminArticleRedactorProps {
     article: ArticleRedactorFormData;
@@ -31,20 +38,31 @@ export const AdminArticleRedactor = ({
     availableTags,
 }: AdminArticleRedactorProps) => {
     const router = useRouter();
+
     const [formData, setFormData] = useState<ArticleRedactorFormData>(article);
     const [status, setStatus] = useState<UpdateArticleResult | null>(null);
     const [previewImageFile, setPreviewImageFile] = useState<File | null>(null);
     const [isPending, startTransition] = useTransition();
 
-    const updateField = <K extends keyof ArticleRedactorFormData>(
-        field: K,
-        value: ArticleRedactorFormData[K],
-    ) => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
-    };
+    const updateField = useCallback(
+        <K extends keyof ArticleRedactorFormData>(
+            field: K,
+            value: ArticleRedactorFormData[K],
+        ) => {
+            setFormData((prev) => ({
+                ...prev,
+                [field]: value,
+            }));
+        },
+        [],
+    );
+
+    const handleMainTextChange = useCallback(
+        (value: string) => {
+            updateField("mainText", value);
+        },
+        [updateField],
+    );
 
     const handlePreviewImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] ?? null;
@@ -90,12 +108,14 @@ export const AdminArticleRedactor = ({
 
                     if (result.success && result.slug) {
                         setPreviewImageFile(null);
+
                         setFormData((prev) => ({
                             ...prev,
                             isPublished,
                             originalSlug: result.slug ?? prev.originalSlug,
                             slug: result.slug ?? prev.slug,
                         }));
+
                         router.replace(
                             `/admin/redactor/article/${result.slug}`,
                         );
@@ -140,50 +160,10 @@ export const AdminArticleRedactor = ({
             />
 
             <div className="grid gap-6 rounded-3xl bg-white p-6 dark:bg-gray-900">
-                <StyledTextarea
-                    id="article-title"
-                    label="Название"
-                    value={formData.title}
-                    onChange={(event) =>
-                        updateField("title", event.target.value)
-                    }
-                    required
-                    rows={2}
-                />
-
-                <StyledInput
-                    id="article-slug"
-                    label="Slug"
-                    type="text"
-                    value={formData.slug}
-                    onChange={(event) =>
-                        updateField("slug", event.target.value)
-                    }
-                    required
-                />
-
-                <div>
-                    <label className="space-y-2 text-sm font-medium text-black dark:text-white">
-                        <span className="block text-gray-400">
-                            Изображение превью
-                        </span>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handlePreviewImageChange}
-                            className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-3 text-black transition outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
-                        />
-                        <span className="block text-xs text-gray-500 dark:text-gray-400">
-                            {previewImageFile
-                                ? previewImageFile.name
-                                : formData.previewImg}
-                        </span>
-                    </label>
-                </div>
-
                 <div className="grid gap-4 rounded-2xl bg-gray-50 text-sm text-gray-600 dark:bg-gray-900 dark:text-gray-300">
                     <label className="space-y-2">
                         <span className="block text-gray-400">Автор</span>
+
                         <div className="relative">
                             <select
                                 value={formData.authorId}
@@ -216,6 +196,7 @@ export const AdminArticleRedactor = ({
 
                     <div className="space-y-2">
                         <span className="block text-gray-400">Темы</span>
+
                         <div className="flex flex-wrap gap-2">
                             {availableTags.map((tag) => {
                                 const isSelected = formData.tagIds.includes(
@@ -227,7 +208,7 @@ export const AdminArticleRedactor = ({
                                         key={tag.id}
                                         className={`cursor-pointer rounded-full border px-3 py-2 text-xs font-semibold transition ${
                                             isSelected
-                                                ? "border-slate-950 bg-slate-950 text-white dark:border-white dark:bg-white dark:text-black"
+                                                ? "border-slate-950 bg-slate-800 text-white dark:border-white dark:bg-white dark:text-black"
                                                 : "border-gray-200 bg-white text-gray-600 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
                                         }`}
                                     >
@@ -239,6 +220,7 @@ export const AdminArticleRedactor = ({
                                             }
                                             className="sr-only"
                                         />
+
                                         {tag.name}
                                     </label>
                                 );
@@ -248,13 +230,55 @@ export const AdminArticleRedactor = ({
                 </div>
 
                 <label className="space-y-2 text-sm font-medium text-black dark:text-white">
-                    <span>Основной текст</span>
+                    <span className="block text-gray-400">
+                        Изображение превью
+                    </span>
+
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePreviewImageChange}
+                        className="w-full cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-3 text-black transition outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+                    />
+
+                    <span className="block text-xs text-gray-500 dark:text-gray-400">
+                        {previewImageFile
+                            ? previewImageFile.name
+                            : formData.previewImg}
+                    </span>
+                </label>
+
+                <StyledTextarea
+                    id="article-title"
+                    label="Название"
+                    value={formData.title}
+                    onChange={(event) =>
+                        updateField("title", event.target.value)
+                    }
+                    required
+                    rows={2}
+                />
+
+                <StyledInput
+                    id="article-slug"
+                    label="Slug"
+                    type="text"
+                    value={formData.slug}
+                    onChange={(event) =>
+                        updateField("slug", event.target.value)
+                    }
+                    required
+                />
+
+                <div className="space-y-2 text-sm font-medium text-black dark:text-white">
+                    <span className="block">Основной текст</span>
+
                     <QuillEditor
                         value={formData.mainText}
-                        onChange={(value) => updateField("mainText", value)}
+                        onChange={handleMainTextChange}
                         className="rounded-xl border border-gray-200 dark:border-gray-700"
                     />
-                </label>
+                </div>
             </div>
 
             <div className="flex-between flex-wrap gap-3">
@@ -266,6 +290,7 @@ export const AdminArticleRedactor = ({
                 >
                     {formData.isPublished ? "В черновик" : "Опубликовать"}
                 </button>
+
                 <button
                     type="submit"
                     disabled={isPending}
