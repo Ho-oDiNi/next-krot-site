@@ -16,7 +16,7 @@
 
 .label,
 .labelTextarea {
-  @apply pointer-events-none absolute left-4 text-base text-neutral-500 transition-all;
+  @apply pointer-events-none absolute left-4 text-base text-gray-400 transition-all;
 }
 
 .label {
