@@ -42,15 +42,9 @@ const EMPTY_FORM: ArticleTaxonomyFormData = {
 const getEntityTitle = (entity: ArticleTaxonomyEntity) =>
     entity === "author" ? "автора" : "тему";
 
-const createSlug = (name: string) =>
-    name
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-zа-яё0-9]+/gi, "-")
-        .replace(/^-+|-+$/g, "");
-
 export const AdminArticleTaxonomyPanel = () => {
     const router = useRouter();
+
     const [activeEntity, setActiveEntity] =
         useState<ArticleTaxonomyEntity>("author");
     const [authors, setAuthors] = useState<Author[]>([]);
@@ -58,7 +52,6 @@ export const AdminArticleTaxonomyPanel = () => {
     const [formData, setFormData] =
         useState<ArticleTaxonomyFormData>(EMPTY_FORM);
     const [isFormVisible, setIsFormVisible] = useState(false);
-    const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
     const [status, setStatus] = useState<ArticleTaxonomyResult | null>(null);
     const [isPending, startTransition] = useTransition();
 
@@ -101,7 +94,6 @@ export const AdminArticleTaxonomyPanel = () => {
 
     const resetForm = () => {
         setFormData(EMPTY_FORM);
-        setIsSlugManuallyEdited(false);
         setIsFormVisible(false);
     };
 
@@ -112,16 +104,7 @@ export const AdminArticleTaxonomyPanel = () => {
         setFormData((prev) => ({
             ...prev,
             [field]: value,
-            slug:
-                field === "name" && !prev.id && !isSlugManuallyEdited
-                    ? createSlug(String(value))
-                    : prev.slug,
         }));
-    };
-
-    const handleSlugChange = (value: string) => {
-        setIsSlugManuallyEdited(true);
-        updateFormField("slug", value);
     };
 
     const handleAvatarImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -154,14 +137,12 @@ export const AdminArticleTaxonomyPanel = () => {
 
     const handleAdd = () => {
         setStatus(null);
-        setIsSlugManuallyEdited(false);
         setFormData(EMPTY_FORM);
         setIsFormVisible(true);
     };
 
     const handleEdit = (item: Author | Tag) => {
         setStatus(null);
-        setIsSlugManuallyEdited(true);
         setFormData({
             id: item.id,
             name: item.name,
@@ -223,6 +204,7 @@ export const AdminArticleTaxonomyPanel = () => {
                     : activeEntity === "author"
                       ? createArticleAuthor
                       : createArticleTag;
+
                 const result = await action(formData);
 
                 setStatus(result);
@@ -288,6 +270,7 @@ export const AdminArticleTaxonomyPanel = () => {
                 >
                     Авторы
                 </button>
+
                 <button
                     type="button"
                     onClick={() => handleEntityChange("tag")}
@@ -302,7 +285,7 @@ export const AdminArticleTaxonomyPanel = () => {
             </div>
 
             {isFormVisible ? (
-                <form onSubmit={handleSubmit} className="space-y-3 rounded-2xl">
+                <form onSubmit={handleSubmit} className="space-y-2 rounded-2xl">
                     <h3 className="font-semibold">
                         {formData.id ? "Редактировать" : "Добавить"}{" "}
                         {getEntityTitle(activeEntity)}
@@ -318,13 +301,14 @@ export const AdminArticleTaxonomyPanel = () => {
                         }
                         required
                     />
+
                     <StyledInput
                         id="article-taxonomy-slug"
                         label="Slug"
                         type="text"
                         value={formData.slug}
                         onChange={(event) =>
-                            handleSlugChange(event.target.value)
+                            updateFormField("slug", event.target.value)
                         }
                         required
                     />
@@ -341,10 +325,11 @@ export const AdminArticleTaxonomyPanel = () => {
                                         event.target.value,
                                     )
                                 }
-                                rows={3}
+                                rows={6}
                                 required
                             />
-                            <label className="space-y-2 text-sm font-medium text-black dark:text-white">
+
+                            <label className="text-sm font-medium text-black dark:text-white">
                                 <span className="block text-slate-500 dark:text-slate-400">
                                     Аватар
                                 </span>
@@ -356,7 +341,7 @@ export const AdminArticleTaxonomyPanel = () => {
                                     className="w-full cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-3 text-black transition outline-none focus:border-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
                                 />
 
-                                <span className="block truncate text-xs text-slate-500 dark:text-slate-400">
+                                <span className="mb-2 block truncate text-xs text-slate-500 dark:text-slate-400">
                                     {formData.avatarImageFile
                                         ? formData.avatarImageFile.name
                                         : formData.avatarImg ||
@@ -366,14 +351,12 @@ export const AdminArticleTaxonomyPanel = () => {
                         </>
                     ) : null}
 
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            type="submit"
-                            disabled={isPending}
-                            className="rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black"
-                        >
-                            {isPending ? "Сохранение..." : "Сохранить"}
-                        </button>
+                    <StatusMessage
+                        message={status?.message}
+                        success={status?.success}
+                    />
+
+                    <div className="flex-between mt-4 flex-wrap gap-2">
                         <button
                             type="button"
                             onClick={resetForm}
@@ -381,68 +364,77 @@ export const AdminArticleTaxonomyPanel = () => {
                         >
                             Отменить
                         </button>
+
+                        <button
+                            type="submit"
+                            disabled={isPending}
+                            className="rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black"
+                        >
+                            {isPending ? "Сохранение..." : "Сохранить"}
+                        </button>
                     </div>
                 </form>
-            ) : null}
-
-            <StatusMessage
-                message={status?.message}
-                success={status?.success}
-            />
-
-            <div className="space-y-2">
-                <h3 className="font-semibold">Список</h3>
+            ) : (
                 <div className="space-y-2">
-                    {activeItems.map((item) => (
-                        <div
-                            key={item.id}
-                            className="rounded-2xl bg-white p-3 text-sm shadow-sm dark:bg-slate-900"
-                        >
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="min-w-0">
-                                    <p className="text-xs font-semibold text-slate-950 lg:text-base dark:text-white">
-                                        {item.name}
-                                    </p>
-                                    <p className="truncate text-xs text-slate-500">
-                                        /{item.slug}
-                                    </p>
-                                </div>
-                                <div className="flex shrink-0 gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleEdit(item)}
-                                        className="rounded-full border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
-                                    >
-                                        Изм.
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleDelete(item.id)}
-                                        disabled={isPending}
-                                        className="rounded-full border border-red-200 px-3 py-1 text-xs font-semibold text-red-600 transition hover:border-red-400 disabled:cursor-not-allowed disabled:opacity-60"
-                                    >
-                                        Удалить
-                                    </button>
+                    <h3 className="font-semibold">Список</h3>
+
+                    <div className="space-y-2">
+                        {activeItems.map((item) => (
+                            <div
+                                key={item.id}
+                                className="rounded-2xl bg-white p-3 text-sm shadow-sm dark:bg-slate-900"
+                            >
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <p className="text-xs font-semibold text-slate-950 lg:text-base dark:text-white">
+                                            {item.name}
+                                        </p>
+
+                                        <p className="truncate text-xs text-slate-500">
+                                            /{item.slug}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex shrink-0 gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleEdit(item)}
+                                            className="rounded-full border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-slate-500 dark:border-slate-700 dark:text-slate-200"
+                                        >
+                                            Изм.
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                handleDelete(item.id)
+                                            }
+                                            disabled={isPending}
+                                            className="rounded-full border border-red-200 px-3 py-1 text-xs font-semibold text-red-600 transition hover:border-red-400 disabled:cursor-not-allowed disabled:opacity-60"
+                                        >
+                                            Удалить
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
 
-                    {!activeItems.length ? (
-                        <p className="rounded-2xl bg-white p-4 text-sm text-slate-500 dark:bg-slate-900">
-                            Пока нет записей.
-                        </p>
-                    ) : null}
+                        {!activeItems.length ? (
+                            <p className="rounded-2xl bg-white p-4 text-sm text-slate-500 dark:bg-slate-900">
+                                Пока нет записей.
+                            </p>
+                        ) : null}
 
-                    <button
-                        type="button"
-                        onClick={handleAdd}
-                        className="w-full rounded-2xl border border-dashed border-slate-300 bg-white p-3 text-sm font-semibold text-slate-700 transition hover:border-slate-500 hover:text-slate-950 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
-                    >
-                        Добавить
-                    </button>
+                        <button
+                            type="button"
+                            onClick={handleAdd}
+                            className="w-full rounded-2xl border border-dashed border-slate-300 bg-white p-3 text-sm font-semibold text-slate-700 transition hover:border-slate-500 hover:text-slate-950 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
+                        >
+                            Добавить
+                        </button>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

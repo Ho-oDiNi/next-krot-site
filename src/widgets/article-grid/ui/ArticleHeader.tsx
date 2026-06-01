@@ -48,21 +48,20 @@ export const ArticleHeader = ({ article, author, tags }: ArticleCardProps) => {
                     ~ {article.readingTime ?? 7} мин
                 </span>
             </div>
-            <div className="flex flex-col gap-1">
-                <span className="text-gray-500">Темы</span>
-                <span className="flex gap-1 text-nowrap text-black dark:text-white">
-                    {tags.map((tag) => (
-                        <Link
-                            key={tag.id}
-                            href={`/tag/${tag.slug}`}
-                            className=""
-                        >
-                            #{tag.name}
-                            {tag !== tags[tags.length - 1] && " / "}
-                        </Link>
-                    ))}
-                </span>
-            </div>
+            {tags.length > 0 && (
+                <div className="flex flex-col gap-1">
+                    <span className="text-gray-500">Темы</span>
+
+                    <span className="flex gap-1 text-nowrap text-black dark:text-white">
+                        {tags.map((tag, index) => (
+                            <Link key={tag.id} href={`/tag/${tag.slug}`}>
+                                #{tag.name}
+                                {index !== tags.length - 1 && " / "}
+                            </Link>
+                        ))}
+                    </span>
+                </div>
+            )}
         </div>
     );
 };
