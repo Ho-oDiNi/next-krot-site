@@ -16,9 +16,9 @@ const AdminMenu = ({
     onSettings,
 }: AdminMenuProps) => {
     return (
-        <menu className="fixed right-5 bottom-5 z-99 flex flex-col gap-4 rounded-3xl p-2 shadow-2xl backdrop-blur-xl">
+        <menu className="fixed right-5 bottom-5 z-[99] flex flex-col gap-4 rounded-3xl p-2 shadow-2xl backdrop-blur-xl">
             <AdminButton
-                callback={onSettings}
+                onClick={onSettings}
                 ariaLabel="Создать, изменить или удалить темы и авторов статей"
             >
                 <span className="block text-3xl leading-none text-slate-700 dark:text-slate-100">
@@ -34,7 +34,7 @@ const AdminMenu = ({
             </AdminButton>
 
             <AdminButton
-                callback={onDeleteArticle}
+                onClick={onDeleteArticle}
                 disabled={!canDeleteArticle}
                 ariaLabel={
                     canDeleteArticle
