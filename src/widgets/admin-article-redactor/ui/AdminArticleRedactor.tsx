@@ -46,12 +46,6 @@ export const AdminArticleRedactor = ({
         [tags],
     );
 
-    const calculatedReadingTime = useMemo(() => {
-        const readingTime = Math.ceil(formData.mainText.length / 1400);
-
-        return Math.max(readingTime, 1);
-    }, [formData.mainText]);
-
     const updateField = <K extends keyof ArticleRedactorFormData>(
         field: K,
         value: ArticleRedactorFormData[K],
@@ -84,8 +78,7 @@ export const AdminArticleRedactor = ({
         setPreviewImageFile(file);
     };
 
-    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+    const saveArticle = (isPublished: boolean) => {
         setStatus(null);
 
         startTransition(() => {
@@ -98,7 +91,7 @@ export const AdminArticleRedactor = ({
                         previewImg: formData.previewImg || null,
                         previewImageFile,
                         mainText: formData.mainText,
-                        isPublished: formData.isPublished,
+                        isPublished,
                     });
 
                     setStatus(result);
@@ -107,6 +100,7 @@ export const AdminArticleRedactor = ({
                         setPreviewImageFile(null);
                         setFormData((prev) => ({
                             ...prev,
+                            isPublished,
                             originalSlug: result.slug ?? prev.originalSlug,
                             slug: result.slug ?? prev.slug,
                         }));
@@ -126,6 +120,15 @@ export const AdminArticleRedactor = ({
                 }
             })();
         });
+    };
+
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        saveArticle(formData.isPublished);
+    };
+
+    const handlePublicationToggle = () => {
+        saveArticle(!formData.isPublished);
     };
 
     return (
@@ -160,7 +163,7 @@ export const AdminArticleRedactor = ({
                     />
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div>
                     <label className="space-y-2 text-sm font-medium text-black dark:text-white">
                         <span>Изображение превью</span>
                         <input
@@ -175,18 +178,9 @@ export const AdminArticleRedactor = ({
                                 : formData.previewImg}
                         </span>
                     </label>
-
-                    <div className="space-y-2 rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 dark:bg-gray-950 dark:text-gray-300">
-                        <span className="block text-gray-400">
-                            Время чтения
-                        </span>
-                        <span className="font-medium text-black dark:text-white">
-                            {calculatedReadingTime} мин.
-                        </span>
-                    </div>
                 </div>
 
-                <div className="grid gap-4 rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 md:grid-cols-3 dark:bg-gray-950 dark:text-gray-300">
+                <div className="grid gap-4 rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 md:grid-cols-2 dark:bg-gray-950 dark:text-gray-300">
                     <div>
                         <span className="block text-gray-400">Автор</span>
                         <span className="font-medium text-black dark:text-white">
@@ -199,17 +193,6 @@ export const AdminArticleRedactor = ({
                             {tagList || "Без тем"}
                         </span>
                     </div>
-                    <label className="flex items-center gap-3 font-medium text-black dark:text-white">
-                        <input
-                            type="checkbox"
-                            checked={formData.isPublished}
-                            onChange={(event) =>
-                                updateField("isPublished", event.target.checked)
-                            }
-                            className="size-5"
-                        />
-                        Опубликована
-                    </label>
                 </div>
 
                 <label className="space-y-2 text-sm font-medium text-black dark:text-white">
@@ -225,10 +208,11 @@ export const AdminArticleRedactor = ({
             <div className="flex-between flex-wrap gap-3">
                 <button
                     type="button"
-                    onClick={() => router.push("/admin")}
-                    className="rounded-full border border-gray-300 bg-slate-100 px-8 py-4 text-sm font-semibold text-black transition hover:border-gray-500 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
+                    onClick={handlePublicationToggle}
+                    disabled={isPending}
+                    className="rounded-full border border-gray-300 bg-slate-100 px-8 py-4 text-sm font-semibold text-black transition hover:border-gray-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
                 >
-                    Вернуться в админку
+                    {formData.isPublished ? "В черновик" : "Опубликовать"}
                 </button>
                 <button
                     type="submit"
