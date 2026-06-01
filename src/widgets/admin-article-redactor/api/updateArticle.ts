@@ -40,10 +40,6 @@ const normalizeArticlePayload = (payload: UpdateArticlePayload) => {
     const previewImageFile = getArticlePreviewImageFile(payload);
     const uniqueTagIds = Array.from(new Set(payload.tagIds));
 
-    if (!payload.originalSlug.trim()) {
-        throw new Error("Не найден исходный slug статьи");
-    }
-
     if (!slug) {
         throw new Error("Slug статьи обязателен");
     }
@@ -70,7 +66,7 @@ const normalizeArticlePayload = (payload: UpdateArticlePayload) => {
     }
 
     return {
-        originalSlug: payload.originalSlug.trim(),
+        originalSlug: payload.originalSlug?.trim() || null,
         data: {
             slug,
             title,
@@ -102,12 +98,14 @@ export const updateArticle = async (
         const { originalSlug, data, previewImageFile } =
             normalizeArticlePayload(payload);
 
-        const existingArticle = await prisma.article.findUnique({
-            where: { slug: originalSlug },
-            select: { previewImg: true },
-        });
+        const existingArticle = originalSlug
+            ? await prisma.article.findUnique({
+                  where: { slug: originalSlug },
+                  select: { previewImg: true },
+              })
+            : null;
 
-        if (!existingArticle) {
+        if (originalSlug && !existingArticle) {
             throw new Error("Статья не найдена");
         }
 
@@ -115,31 +113,47 @@ export const updateArticle = async (
             uploadedPreviewImageUrl = await savePublicImage(previewImageFile);
         }
 
-        const updatedArticle = await prisma.article.update({
-            where: { slug: originalSlug },
-            data: {
-                ...data,
-                previewImg: uploadedPreviewImageUrl ?? data.previewImg,
-            },
-            select: {
-                slug: true,
-            },
-        });
+        const articleData = {
+            ...data,
+            previewImg: uploadedPreviewImageUrl ?? data.previewImg,
+        };
 
-        if (uploadedPreviewImageUrl && existingArticle.previewImg) {
+        const savedArticle = originalSlug
+            ? await prisma.article.update({
+                  where: { slug: originalSlug },
+                  data: articleData,
+                  select: { slug: true },
+              })
+            : await prisma.article.create({
+                  data: {
+                      ...articleData,
+                      tags: {
+                          connect: data.tags.set,
+                      },
+                  },
+                  select: { slug: true },
+              });
+
+        if (uploadedPreviewImageUrl && existingArticle?.previewImg) {
             await removePublicFile(existingArticle.previewImg);
         }
 
         revalidatePath("/admin");
-        revalidatePath(`/admin/redactor/article/${originalSlug}`);
-        revalidatePath(`/admin/redactor/article/${updatedArticle.slug}`);
-        revalidatePath(`/article/${originalSlug}`);
-        revalidatePath(`/article/${updatedArticle.slug}`);
+        revalidatePath("/admin/redactor/article");
+        revalidatePath(`/admin/redactor/article/${savedArticle.slug}`);
+        revalidatePath(`/article/${savedArticle.slug}`);
+
+        if (originalSlug) {
+            revalidatePath(`/admin/redactor/article/${originalSlug}`);
+            revalidatePath(`/article/${originalSlug}`);
+        }
 
         return {
             success: true,
-            message: "Статья успешно сохранена",
-            slug: updatedArticle.slug,
+            message: originalSlug
+                ? "Статья успешно сохранена"
+                : "Статья успешно создана",
+            slug: savedArticle.slug,
         };
     } catch (error) {
         if (uploadedPreviewImageUrl) {

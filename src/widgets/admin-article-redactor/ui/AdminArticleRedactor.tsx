@@ -1,12 +1,6 @@
 "use client";
 
-import {
-    ChangeEvent,
-    FormEvent,
-    useMemo,
-    useState,
-    useTransition,
-} from "react";
+import { ChangeEvent, FormEvent, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import type { Author } from "@/entities/author";
@@ -41,15 +35,6 @@ export const AdminArticleRedactor = ({
     const [status, setStatus] = useState<UpdateArticleResult | null>(null);
     const [previewImageFile, setPreviewImageFile] = useState<File | null>(null);
     const [isPending, startTransition] = useTransition();
-
-    const selectedTagList = useMemo(
-        () =>
-            availableTags
-                .filter((tag) => formData.tagIds.includes(tag.id))
-                .map((tag) => `#${tag.name}`)
-                .join(" / "),
-        [availableTags, formData.tagIds],
-    );
 
     const updateField = <K extends keyof ArticleRedactorFormData>(
         field: K,

@@ -1,5 +1,5 @@
 export interface ArticleRedactorFormData {
-    originalSlug: string;
+    originalSlug?: string;
     slug: string;
     title: string;
     previewImg: string;
@@ -11,7 +11,7 @@ export interface ArticleRedactorFormData {
 }
 
 export interface UpdateArticlePayload {
-    originalSlug: string;
+    originalSlug?: string;
     slug: string;
     title: string;
     previewImg: string | null;

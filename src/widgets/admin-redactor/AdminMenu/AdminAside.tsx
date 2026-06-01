@@ -2,18 +2,29 @@
 
 import CloseIcon from "@icons/close-black.svg";
 import { AdminArticleTaxonomyPanel } from "@/widgets/admin-article-taxonomy";
-import AdminRedactorForm from "../AdminMenuService";
+import ArticleDeletePanel from "./ArticleDeletePanel";
+
+export type AdminAsideMode = "articleTaxonomy" | "deleteArticle";
 
 interface AdminRedactorProps {
     onClose: () => void;
-    mode: "edit" | "create" | "delete" | "articleTaxonomy";
+    mode: AdminAsideMode;
+    articleSlug?: string | null;
 }
 
-const AdminAside = ({ onClose, mode }: AdminRedactorProps) => {
+const AdminAside = ({
+    onClose,
+    mode,
+    articleSlug = null,
+}: AdminRedactorProps) => {
     return (
-        <aside className="absolute right-0 z-99 m-4 w-full lg:w-1/3">
-            <div className="no-scrollbar sticky top-20 max-h-[85vh] overflow-y-auto rounded-2xl border-2 border-black bg-slate-50 inset-shadow-sm/30">
-                <button onClick={onClose}>
+        <aside className="fixed right-0 z-99 m-4 w-full lg:w-1/3">
+            <div className="no-scrollbar sticky top-20 max-h-[85vh] overflow-y-auto rounded-2xl border-2 border-black bg-slate-50 inset-shadow-sm/30 dark:border-slate-700 dark:bg-slate-950">
+                <button
+                    type="button"
+                    onClick={onClose}
+                    aria-label="Закрыть панель"
+                >
                     <CloseIcon
                         className="absolute top-5 right-5 h-10 w-10 rounded-full"
                         alt="Закрыть"
@@ -22,7 +33,10 @@ const AdminAside = ({ onClose, mode }: AdminRedactorProps) => {
                 {mode === "articleTaxonomy" ? (
                     <AdminArticleTaxonomyPanel />
                 ) : (
-                    <AdminRedactorForm mode={mode} onClose={onClose} />
+                    <ArticleDeletePanel
+                        articleSlug={articleSlug}
+                        onClose={onClose}
+                    />
                 )}
             </div>
         </aside>
