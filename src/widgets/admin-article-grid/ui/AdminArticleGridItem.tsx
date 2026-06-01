@@ -3,89 +3,8 @@ import Link from "next/link";
 
 import type { ArticleWithRelations } from "@/entities/article/model";
 import { cn } from "@/shared/lib/cn";
-
-const ARTICLE_EDIT_BASE_PATH = "/admin/redactor/article";
-const ADMIN_ARTICLE_DATE_LOCALE = "en-GB";
-
-const formatAdminArticleDate = (date: Date) => {
-    const today = new Date();
-    const todayStart = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-    );
-    const dateStart = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate(),
-    );
-
-    const daysDiff = Math.round(
-        (dateStart.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24),
-    );
-
-    if (daysDiff === 0) {
-        return "Today";
-    }
-
-    if (daysDiff === -1) {
-        return "Yesterday";
-    }
-
-    return new Intl.DateTimeFormat(ADMIN_ARTICLE_DATE_LOCALE, {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-    }).format(date);
-};
-
-const ImagePlaceholderIcon = () => (
-    <svg
-        aria-hidden="true"
-        className="size-5 text-slate-400"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <path
-            d="M4.75 6.75A2 2 0 0 1 6.75 4.75h10.5a2 2 0 0 1 2 2v10.5a2 2 0 0 1-2 2H6.75a2 2 0 0 1-2-2V6.75Z"
-            stroke="currentColor"
-            strokeWidth="1.5"
-        />
-        <path
-            d="m6.75 16.75 3.5-3.5 2.5 2.5 1.75-1.75 2.75 2.75"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-        <circle cx="15.75" cy="8.25" r="1" fill="currentColor" />
-    </svg>
-);
-
-const PencilIcon = () => (
-    <svg
-        aria-hidden="true"
-        className="size-5"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <path
-            d="M4.75 19.25h3.1L18.6 8.5a2.12 2.12 0 0 0-3-3L4.75 16.25v3Z"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-        <path
-            d="m14.25 6.85 2.9 2.9"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-        />
-    </svg>
-);
+import PencilIcon from "@icons/pencil.svg";
+import ImagePlaceholderIcon from "@icons/image-placeholder.svg";
 
 interface AdminArticleGridItemProps {
     article: ArticleWithRelations;
@@ -94,7 +13,7 @@ interface AdminArticleGridItemProps {
 export const AdminArticleGridItem = ({
     article,
 }: AdminArticleGridItemProps) => {
-    const editHref = `${ARTICLE_EDIT_BASE_PATH}/${article.slug}`;
+    const editHref = `/admin/redactor/article/${article.slug}`;
     const statusText = article.isPublished ? "Published" : "Draft";
 
     return (
@@ -109,7 +28,7 @@ export const AdminArticleGridItem = ({
                         className="h-full w-full object-cover"
                     />
                 ) : (
-                    <ImagePlaceholderIcon />
+                    <ImagePlaceholderIcon className="size-15 text-slate-400" />
                 )}
             </div>
 
@@ -120,7 +39,11 @@ export const AdminArticleGridItem = ({
 
                 <p className="mt-1 text-sm leading-tight text-slate-400 sm:text-lg">
                     By {article.author.name} -{" "}
-                    {formatAdminArticleDate(article.updatedAt)}
+                    {article.updatedAt.toLocaleDateString("ru-RU", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                    })}
                 </p>
 
                 <p
