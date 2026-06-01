@@ -18,8 +18,8 @@ const AdminAside = ({
     articleSlug = null,
 }: AdminRedactorProps) => {
     return (
-        <aside className="fixed right-0 z-99 m-4 w-full lg:w-1/3">
-            <div className="no-scrollbar sticky top-20 max-h-[85vh] overflow-y-auto rounded-2xl border-2 border-black bg-slate-50 inset-shadow-sm/30 dark:border-slate-700 dark:bg-slate-950">
+        <aside className="fixed top-20 right-4 left-4 z-[99] lg:left-auto lg:w-1/3">
+            <div className="no-scrollbar max-h-[85vh] overflow-y-auto rounded-2xl border-2 border-black bg-slate-50 inset-shadow-sm/30 dark:border-slate-700 dark:bg-slate-950">
                 <button
                     type="button"
                     onClick={onClose}
