@@ -1,12 +1,23 @@
 "use client";
 
-import { FormEvent, useMemo, useState, useTransition } from "react";
+import {
+    ChangeEvent,
+    FormEvent,
+    useMemo,
+    useState,
+    useTransition,
+} from "react";
 import { useRouter } from "next/navigation";
 
 import type { Author } from "@/entities/author";
 import type { Tag } from "@/entities/tag";
 import QuillEditor from "@/shared/lib/react-quill";
+import {
+    PUBLIC_IMAGE_MAX_SIZE_BYTES,
+    PUBLIC_IMAGE_MAX_SIZE_LABEL,
+} from "@/shared/lib/file-storage/config";
 import StatusMessage from "@/shared/ui/StatusMessage";
+import { StyledInput, StyledTextarea } from "@/shared/ui/StyledInput";
 import { updateArticle } from "@/widgets/admin-article-redactor/api/updateArticle";
 import type {
     ArticleRedactorFormData,
@@ -19,22 +30,6 @@ interface AdminArticleRedactorProps {
     tags: Tag[];
 }
 
-const parseReadingTime = (value: string) => {
-    const trimmedValue = value.trim();
-
-    if (!trimmedValue) {
-        return null;
-    }
-
-    const readingTime = Number(trimmedValue);
-
-    if (!Number.isFinite(readingTime) || readingTime < 0) {
-        throw new Error("Время чтения должно быть положительным числом");
-    }
-
-    return Math.round(readingTime);
-};
-
 export const AdminArticleRedactor = ({
     article,
     author,
@@ -43,12 +38,19 @@ export const AdminArticleRedactor = ({
     const router = useRouter();
     const [formData, setFormData] = useState<ArticleRedactorFormData>(article);
     const [status, setStatus] = useState<UpdateArticleResult | null>(null);
+    const [previewImageFile, setPreviewImageFile] = useState<File | null>(null);
     const [isPending, startTransition] = useTransition();
 
     const tagList = useMemo(
         () => tags.map((tag) => `#${tag.name}`).join(" / "),
         [tags],
     );
+
+    const calculatedReadingTime = useMemo(() => {
+        const readingTime = Math.ceil(formData.mainText.length / 1400);
+
+        return Math.max(readingTime, 1);
+    }, [formData.mainText]);
 
     const updateField = <K extends keyof ArticleRedactorFormData>(
         field: K,
@@ -58,6 +60,28 @@ export const AdminArticleRedactor = ({
             ...prev,
             [field]: value,
         }));
+    };
+
+    const handlePreviewImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0] ?? null;
+
+        if (!file) {
+            setPreviewImageFile(null);
+            return;
+        }
+
+        if (file.size > PUBLIC_IMAGE_MAX_SIZE_BYTES) {
+            setStatus({
+                success: false,
+                message: `Размер изображения не должен превышать ${PUBLIC_IMAGE_MAX_SIZE_LABEL}`,
+            });
+            setPreviewImageFile(null);
+            event.target.value = "";
+            return;
+        }
+
+        setStatus(null);
+        setPreviewImageFile(file);
     };
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -72,14 +96,15 @@ export const AdminArticleRedactor = ({
                         slug: formData.slug,
                         title: formData.title,
                         previewImg: formData.previewImg || null,
+                        previewImageFile,
                         mainText: formData.mainText,
-                        readingTime: parseReadingTime(formData.readingTime),
                         isPublished: formData.isPublished,
                     });
 
                     setStatus(result);
 
                     if (result.success && result.slug) {
+                        setPreviewImageFile(null);
                         setFormData((prev) => ({
                             ...prev,
                             originalSlug: result.slug ?? prev.originalSlug,
@@ -112,59 +137,59 @@ export const AdminArticleRedactor = ({
 
             <div className="grid gap-6 rounded-3xl bg-white p-6 dark:bg-gray-900">
                 <div className="grid gap-4 md:grid-cols-2">
-                    <label className="space-y-2 text-sm font-medium text-black dark:text-white">
-                        <span>Название</span>
-                        <input
-                            type="text"
-                            value={formData.title}
-                            onChange={(event) =>
-                                updateField("title", event.target.value)
-                            }
-                            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-black transition outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
-                            required
-                        />
-                    </label>
+                    <StyledTextarea
+                        id="article-title"
+                        label="Название"
+                        value={formData.title}
+                        onChange={(event) =>
+                            updateField("title", event.target.value)
+                        }
+                        required
+                        rows={2}
+                    />
 
-                    <label className="space-y-2 text-sm font-medium text-black dark:text-white">
-                        <span>Slug</span>
-                        <input
-                            type="text"
-                            value={formData.slug}
-                            onChange={(event) =>
-                                updateField("slug", event.target.value)
-                            }
-                            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-black transition outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
-                            required
-                        />
-                    </label>
+                    <StyledInput
+                        id="article-slug"
+                        label="Slug"
+                        type="text"
+                        value={formData.slug}
+                        onChange={(event) =>
+                            updateField("slug", event.target.value)
+                        }
+                        required
+                    />
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
                     <label className="space-y-2 text-sm font-medium text-black dark:text-white">
                         <span>Изображение превью</span>
                         <input
-                            type="url"
-                            value={formData.previewImg}
-                            onChange={(event) =>
-                                updateField("previewImg", event.target.value)
-                            }
-                            placeholder="https://example.com/image.jpg"
+                            type="file"
+                            accept="image/*"
+                            onChange={handlePreviewImageChange}
                             className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-black transition outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
                         />
+                        <span className="block text-xs text-gray-500 dark:text-gray-400">
+                            {previewImageFile
+                                ? previewImageFile.name
+                                : formData.previewImg
+                                  ? `Текущее изображение: ${formData.previewImg}`
+                                  : "Необязательное поле"}
+                        </span>
                     </label>
 
-                    <label className="space-y-2 text-sm font-medium text-black dark:text-white">
-                        <span>Время чтения, минут</span>
-                        <input
-                            type="number"
-                            min="0"
-                            value={formData.readingTime}
-                            onChange={(event) =>
-                                updateField("readingTime", event.target.value)
-                            }
-                            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-black transition outline-none focus:border-gray-500 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
-                        />
-                    </label>
+                    <div className="space-y-2 rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 dark:bg-gray-950 dark:text-gray-300">
+                        <span className="block text-gray-400">
+                            Время чтения
+                        </span>
+                        <span className="font-medium text-black dark:text-white">
+                            {calculatedReadingTime} мин.
+                        </span>
+                        <span className="block text-xs text-gray-500 dark:text-gray-400">
+                            Рассчитывается при сохранении: символы основного
+                            текста / 1400.
+                        </span>
+                    </div>
                 </div>
 
                 <div className="grid gap-4 rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 md:grid-cols-3 dark:bg-gray-950 dark:text-gray-300">
