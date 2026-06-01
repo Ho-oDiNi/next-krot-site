@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ReactNode } from "react";
 
 interface AdminButtonProps {
-    callback?: () => void;
+    onClick?: () => void;
     href?: string;
     children: ReactNode;
     ariaLabel?: string;
@@ -12,10 +12,10 @@ interface AdminButtonProps {
 }
 
 const buttonClassName =
-    "relative size-10 rounded-full bg-white transition hover:bg-slate-300 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-slate-700";
+    "relative flex size-10 items-center justify-center rounded-full bg-white transition hover:bg-slate-300 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-slate-700";
 
 const AdminButton = ({
-    callback,
+    onClick,
     href,
     children,
     ariaLabel,
@@ -24,7 +24,7 @@ const AdminButton = ({
     if (href && !disabled) {
         return (
             <Link
-                className={`${buttonClassName} flex items-center justify-center`}
+                className={buttonClassName}
                 href={href}
                 aria-label={ariaLabel}
             >
@@ -36,7 +36,7 @@ const AdminButton = ({
     return (
         <button
             className={buttonClassName}
-            onClick={callback}
+            onClick={onClick}
             aria-label={ariaLabel}
             disabled={disabled}
             type="button"
