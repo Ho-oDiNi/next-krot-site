@@ -46,6 +46,7 @@ export const AdminArticleTaxonomyPanel = () => {
     const [tags, setTags] = useState<Tag[]>([]);
     const [formData, setFormData] =
         useState<ArticleTaxonomyFormData>(EMPTY_FORM);
+    const [isFormVisible, setIsFormVisible] = useState(false);
     const [status, setStatus] = useState<ArticleTaxonomyResult | null>(null);
     const [isPending, startTransition] = useTransition();
 
@@ -88,6 +89,7 @@ export const AdminArticleTaxonomyPanel = () => {
 
     const resetForm = () => {
         setFormData(EMPTY_FORM);
+        setIsFormVisible(false);
     };
 
     const updateFormField = <K extends keyof ArticleTaxonomyFormData>(
@@ -110,6 +112,12 @@ export const AdminArticleTaxonomyPanel = () => {
         resetForm();
     };
 
+    const handleAdd = () => {
+        setStatus(null);
+        setFormData(EMPTY_FORM);
+        setIsFormVisible(true);
+    };
+
     const handleEdit = (item: Author | Tag) => {
         setStatus(null);
         setFormData({
@@ -119,6 +127,7 @@ export const AdminArticleTaxonomyPanel = () => {
             description: "description" in item ? item.description : "",
             avatarImg: "avatarImg" in item ? (item.avatarImg ?? "") : "",
         });
+        setIsFormVisible(true);
     };
 
     const applySuccessfulResult = (result: ArticleTaxonomyResult) => {
@@ -183,6 +192,15 @@ export const AdminArticleTaxonomyPanel = () => {
     };
 
     const handleDelete = (id: number) => {
+        const itemTitle = activeItems.find((item) => item.id === id)?.name;
+        const deleteConfirmation = itemTitle
+            ? `Удалить «${itemTitle}»? Это действие нельзя отменить.`
+            : "Удалить запись? Это действие нельзя отменить.";
+
+        if (!window.confirm(deleteConfirmation)) {
+            return;
+        }
+
         setStatus(null);
 
         startTransition(() => {
@@ -240,69 +258,72 @@ export const AdminArticleTaxonomyPanel = () => {
                 </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3 rounded-2xl">
-                <h3 className="font-semibold">
-                    {formData.id ? "Редактировать" : "Добавить"}{" "}
-                    {getEntityTitle(activeEntity)}
-                </h3>
+            {isFormVisible ? (
+                <form onSubmit={handleSubmit} className="space-y-3 rounded-2xl">
+                    <h3 className="font-semibold">
+                        {formData.id ? "Редактировать" : "Добавить"}{" "}
+                        {getEntityTitle(activeEntity)}
+                    </h3>
 
-                <StyledInput
-                    id="article-taxonomy-name"
-                    label="Название"
-                    type="text"
-                    value={formData.name}
-                    onChange={(event) =>
-                        updateFormField("name", event.target.value)
-                    }
-                    required
-                />
-                <StyledInput
-                    id="article-taxonomy-slug"
-                    label="Slug"
-                    type="text"
-                    value={formData.slug}
-                    onChange={(event) =>
-                        updateFormField("slug", event.target.value)
-                    }
-                    required
-                />
+                    <StyledInput
+                        id="article-taxonomy-name"
+                        label="Название"
+                        type="text"
+                        value={formData.name}
+                        onChange={(event) =>
+                            updateFormField("name", event.target.value)
+                        }
+                        required
+                    />
+                    <StyledInput
+                        id="article-taxonomy-slug"
+                        label="Slug"
+                        type="text"
+                        value={formData.slug}
+                        onChange={(event) =>
+                            updateFormField("slug", event.target.value)
+                        }
+                        required
+                    />
 
-                {activeEntity === "author" ? (
-                    <>
-                        <StyledTextarea
-                            id="article-taxonomy-description"
-                            label="Описание автора"
-                            value={formData.description ?? ""}
-                            onChange={(event) =>
-                                updateFormField(
-                                    "description",
-                                    event.target.value,
-                                )
-                            }
-                            rows={3}
-                            required
-                        />
-                        <StyledInput
-                            id="article-taxonomy-avatar"
-                            label="URL аватара"
-                            type="text"
-                            value={formData.avatarImg ?? ""}
-                            onChange={(event) =>
-                                updateFormField("avatarImg", event.target.value)
-                            }
-                        />
-                    </>
-                ) : null}
+                    {activeEntity === "author" ? (
+                        <>
+                            <StyledTextarea
+                                id="article-taxonomy-description"
+                                label="Описание автора"
+                                value={formData.description ?? ""}
+                                onChange={(event) =>
+                                    updateFormField(
+                                        "description",
+                                        event.target.value,
+                                    )
+                                }
+                                rows={3}
+                                required
+                            />
+                            <StyledInput
+                                id="article-taxonomy-avatar"
+                                label="URL аватара"
+                                type="text"
+                                value={formData.avatarImg ?? ""}
+                                onChange={(event) =>
+                                    updateFormField(
+                                        "avatarImg",
+                                        event.target.value,
+                                    )
+                                }
+                            />
+                        </>
+                    ) : null}
 
-                <div className="flex flex-wrap gap-2">
-                    <button
-                        type="submit"
-                        disabled={isPending}
-                        className="rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black"
-                    >
-                        {isPending ? "Сохранение..." : "Сохранить"}
-                    </button>
-                    {formData.id ? (
+                    <div className="flex flex-wrap gap-2">
+                        <button
+                            type="submit"
+                            disabled={isPending}
+                            className="rounded-full bg-slate-950 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black"
+                        >
+                            {isPending ? "Сохранение..." : "Сохранить"}
+                        </button>
                         <button
                             type="button"
                             onClick={resetForm}
@@ -310,9 +331,9 @@ export const AdminArticleTaxonomyPanel = () => {
                         >
                             Отменить
                         </button>
-                    ) : null}
-                </div>
-            </form>
+                    </div>
+                </form>
+            ) : null}
 
             <StatusMessage
                 message={status?.message}
@@ -362,6 +383,14 @@ export const AdminArticleTaxonomyPanel = () => {
                             Пока нет записей.
                         </p>
                     ) : null}
+
+                    <button
+                        type="button"
+                        onClick={handleAdd}
+                        className="w-full rounded-2xl border border-dashed border-slate-300 bg-white p-3 text-sm font-semibold text-slate-700 transition hover:border-slate-500 hover:text-slate-950 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
+                    >
+                        Добавить
+                    </button>
                 </div>
             </div>
         </div>
