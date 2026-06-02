@@ -1,7 +1,3 @@
-"use client";
-
-import { useState } from "react";
-
 import { Article } from "@/entities/article";
 import Link from "next/link";
 
@@ -11,18 +7,17 @@ import { ReadMore } from "./ReadMore";
 interface ArticlePreviewProps {
     article: Article;
     editHref?: string;
+    isFullArticle?: boolean;
 }
 
-export const ArticlePreview = ({ article, editHref }: ArticlePreviewProps) => {
-    const [isExpanded, setIsExpanded] = useState(false);
-
-    const handleToggle = () => {
-        setIsExpanded((prev) => !prev);
-    };
-
+export const ArticlePreview = ({
+    article,
+    editHref,
+    isFullArticle = false,
+}: ArticlePreviewProps) => {
     return (
         <>
-            <ArticleBody article={article} isExpanded={isExpanded} />
+            <ArticleBody article={article} isExpanded={isFullArticle} />
 
             {editHref ? (
                 <Link
@@ -33,9 +28,12 @@ export const ArticlePreview = ({ article, editHref }: ArticlePreviewProps) => {
                 </Link>
             ) : (
                 <ReadMore
-                    article={article}
-                    isExpanded={isExpanded}
-                    onToggle={handleToggle}
+                    article={{
+                        id: article.id,
+                        slug: article.slug,
+                        likesCount: article.likesCount,
+                    }}
+                    showArticleLink={!isFullArticle}
                 />
             )}
         </>

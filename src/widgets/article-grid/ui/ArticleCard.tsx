@@ -10,6 +10,7 @@ interface ArticleCardProps {
     author: Author;
     tags: Tag[];
     editHref?: string;
+    isFullArticle?: boolean;
 }
 
 export const ArticleCard = ({
@@ -17,11 +18,16 @@ export const ArticleCard = ({
     author,
     tags,
     editHref,
+    isFullArticle = false,
 }: ArticleCardProps) => {
     return (
         <article className="space-y-6 overflow-hidden rounded-3xl bg-white p-6 dark:bg-gray-900">
             <ArticleHeader article={article} author={author} tags={tags} />
-            <ArticlePreview article={article} editHref={editHref} />
+            <ArticlePreview
+                article={article}
+                editHref={editHref}
+                isFullArticle={isFullArticle}
+            />
         </article>
     );
 };
