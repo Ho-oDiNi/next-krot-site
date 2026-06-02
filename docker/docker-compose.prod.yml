@@ -16,7 +16,7 @@ services:
       PG_HOST: db
       PG_PORT: 5432
       DATABASE_URL: "postgresql://${PG_USER}:${PG_PASSWORD}@db:5432/${PG_DB}?schema=public"
-      CATEGORY_IMAGES_DIR: /app/storage/category-images
+      PUBLIC_IMAGES_DIR: /app/storage/public-images
 
     expose:
       - "3000"
@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
 
     volumes:
-      - category-images:/app/storage/category-images
+      - public-images:/app/storage/public-images
 
   db:
     # если базовый файл уже задаёт image/volumes — можно оставить тут только overrides
@@ -105,4 +105,4 @@ volumes:
   postgres-data:
   caddy-data:
   caddy-config:
-  category-images:
+  public-images:

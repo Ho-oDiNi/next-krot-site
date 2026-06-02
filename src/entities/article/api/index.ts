@@ -52,3 +52,18 @@ export const getArticleBySlug = async (
         },
     });
 };
+
+export const getAllPublishedArticles = async () => {
+    return prisma.article.findMany({
+        where: {
+            isPublished: true,
+        },
+        select: {
+            slug: true,
+            updatedAt: true,
+        },
+        orderBy: {
+            updatedAt: "desc",
+        },
+    });
+};

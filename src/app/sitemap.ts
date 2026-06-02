@@ -1,71 +1,37 @@
 import { getBaseUrl } from "@/core/domains";
-import { getCategories } from "@/entities/category";
+import { getAllPublishedArticles } from "@/entities/article/api";
+import { getAuthors } from "@/entities/author/api";
+import { getTags } from "@/entities/tag/api";
 import { MetadataRoute } from "next";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = await getBaseUrl();
 
-    const staticPages = [
-        {
-            url: baseUrl,
-            lastModified: new Date(),
-            changeFrequency: "daily" as const,
-            priority: 1,
-        },
-        {
-            url: `${baseUrl}/about`,
-            lastModified: new Date(),
-            changeFrequency: "weekly" as const,
-            priority: 0.8,
-        },
-        {
-            url: `${baseUrl}/contacts`,
-            lastModified: new Date(),
-            changeFrequency: "weekly" as const,
-            priority: 0.8,
-        },
-        {
-            url: `${baseUrl}/privacy`,
-            lastModified: new Date(),
-            changeFrequency: "weekly" as const,
-            priority: 0.5,
-        },
-    ];
-
-    const staticIcons = [
-        {
-            url: `${baseUrl}/favicon.ico`,
-            changeFrequency: "never" as const,
-            priority: 0.7,
-        },
-        {
-            url: `${baseUrl}/icon.ico`,
-            changeFrequency: "never" as const,
-            priority: 0.7,
-        },
-        {
-            url: `${baseUrl}/apple-icon.png`,
-            changeFrequency: "never" as const,
-            priority: 0.7,
-        },
-    ];
+    const staticPages = [{ url: baseUrl }, { url: `${baseUrl}/about` }];
 
     if (process.env.BUILD_TIME) {
-        return [...staticPages, ...staticIcons];
+        return [...staticPages];
     }
 
-    const categories = await getCategories();
+    const [articles, tags, authors] = await Promise.all([
+        getAllPublishedArticles(),
+        getTags(),
+        getAuthors(),
+    ]);
 
-    const dynamicPages = categories.flatMap((category) =>
-        category.serviceSlugs.map((serviceSlug: string) => ({
-            url: `${baseUrl}/services/${category.slug}/${serviceSlug}`,
-            lastModified: new Date(),
-            changeFrequency: "weekly" as const,
-            priority: 0.6,
-        })),
-    );
+    const articlePages = articles.map((article) => ({
+        url: `${baseUrl}/article/${article.slug}`,
+    }));
 
-    return [...staticPages, ...staticIcons, ...dynamicPages];
+    const tagPages = tags.map((tag) => ({
+        url: `${baseUrl}/tag/${tag.slug}`,
+    }));
+
+    const authorPages = authors.map((author) => ({
+        url: `${baseUrl}/author/${author.slug}`,
+    }));
+
+    return [...staticPages, ...articlePages, ...tagPages, ...authorPages];
 }
 
 export const dynamic = "force-dynamic";

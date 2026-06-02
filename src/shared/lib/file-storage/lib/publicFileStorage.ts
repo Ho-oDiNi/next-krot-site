@@ -6,7 +6,7 @@ const PUBLIC_IMAGES_PATH = "/upload";
 const DEFAULT_PUBLIC_IMAGES_DIR = path.join(process.cwd(), "public", "upload");
 
 const resolvePublicImagesDir = (): string => {
-    const configuredDir = process.env.CATEGORY_IMAGES_DIR?.trim();
+    const configuredDir = process.env.PUBLIC_IMAGES_DIR?.trim();
 
     if (!configuredDir) {
         return DEFAULT_PUBLIC_IMAGES_DIR;
@@ -103,6 +103,3 @@ export const removePublicFile = async (
         }
     }
 };
-
-export const resolveCategoryImagePath = resolvePublicImagePath;
-export const saveCategoryImage = savePublicImage;

@@ -6,7 +6,5 @@ export {
 export {
     savePublicImage,
     resolvePublicImagePath,
-    saveCategoryImage,
     removePublicFile,
-    resolveCategoryImagePath,
 } from "./lib/publicFileStorage";
