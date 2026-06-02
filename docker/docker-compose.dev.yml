@@ -1,0 +1,34 @@
+name: yamal-development
+services:
+  web:
+    build:
+      context: ..
+      target: deps
+      dockerfile: docker/Dockerfile
+    command: ["pnpm", "dev"]
+    env_file:
+      - ../config/.env.local
+      - ../config/.env.development
+    environment:
+      # Внутреннее подключение
+      PG_HOST: db
+      PG_PORT: 5432
+      DATABASE_URL: "postgresql://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:${PG_PORT}/${PG_DB}?schema=public"
+      # Эти две переменные улучшают хот-reload в Docker на Win/Mac:
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ..:/app
+      - /app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+  db:
+    env_file:
+      - ../config/.env.local
+      - ../config/.env.development
+    ports:
+      - "${PG_HOST_OUT:-127.0.0.1}:${PG_PORT_OUT:-6543}:5432"

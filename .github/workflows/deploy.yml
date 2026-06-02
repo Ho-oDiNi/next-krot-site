@@ -1,0 +1,116 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  DOCKER_IMAGE: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/next-krot-image
+  PATH_WEB: ${HOME}/www/next-krot-site
+  PATH_ENV: ${HOME}/env/next-krot-site
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-prod
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Проверим, что Docker/Compose есть на GitHub runner
+      - name: Check Docker
+        run: |
+          docker version
+          docker compose version
+
+      - name: Docker Login (Docker Hub)
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & Push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          target: runner
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:latest
+            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+          cache-from: type=registry,ref=${{ env.DOCKER_IMAGE }}:latest
+          cache-to: type=inline
+
+      # --- ДЕПЛОЙ НА ТВОЙ СЕРВЕР ПО SSH ---
+
+      # 1) Поднимаем ssh-agent и грузим приватный ключ из секрета
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # 2) Добавляем host key сервера (без интерактива known_hosts)
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Prepare remote dirs
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=accept-new \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '\
+              mkdir -p "$HOME/www/next-krot-site" "$HOME/env/next-krot-site" \
+            '
+
+      - name: Rsync repo to server (infra-only)
+        run: |
+          rsync -a --delete \
+            -e "ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=accept-new" \
+            -f '+ /Makefile' \
+            -f '+ /docker/' \
+            -f '+ /docker/docker-compose.yml' \
+            -f '+ /docker/docker-compose.prod.yml' \
+            -f '+ /docker/Caddyfile' \
+            -f '- *' \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/www/next-krot-site/
+
+      # 4) Выполняем docker compose на сервере
+      - name: Docker Compose Pull & Up (production) on remote
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=accept-new \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '\
+              docker compose --env-file "$HOME/env/next-krot-site/.env.production" \
+                -f "$HOME/www/next-krot-site/docker/docker-compose.yml" \
+                -f "$HOME/www/next-krot-site/docker/docker-compose.prod.yml" pull web && \
+              docker compose --env-file "$HOME/env/next-krot-site/.env.production" \
+                -f "$HOME/www/next-krot-site/docker/docker-compose.yml" \
+                -f "$HOME/www/next-krot-site/docker/docker-compose.prod.yml" up -d && \
+              docker compose --env-file "$HOME/env/next-krot-site/.env.production" \
+                -f "$HOME/www/next-krot-site/docker/docker-compose.yml" \
+                -f "$HOME/www/next-krot-site/docker/docker-compose.prod.yml" ps \
+            '
+
+      # Очистка от сборок докера
+      - name: Remote Docker cleanup (safe)
+        run: |
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=accept-new \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+              set -e
+              docker image prune -f --filter 'until=240h'
+              docker container prune -f
+              docker builder prune -af --filter 'until=240h'
+              docker volume prune -f
+              docker system df
+            "

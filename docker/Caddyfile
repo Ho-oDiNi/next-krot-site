@@ -1,0 +1,21 @@
+{
+  # Глобальные настройки
+  email director@krot.media         # для Let's Encrypt
+  # auto_https включён по умолчанию; http->https редирект тоже
+  # лог можно включить тут, если нужно: debug
+}
+
+www.krot.media {
+  redir https://krot.media{uri} temporary
+}
+
+krot.media {
+  encode gzip
+
+  @health {
+    path /healthz
+  }
+  respond @health "ok" 200
+
+  reverse_proxy web:3000
+}
