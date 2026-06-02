@@ -2,9 +2,9 @@ import Image from "next/image";
 
 import { Article } from "@/entities/article";
 import { cn } from "@/shared/lib/cn";
+import { ParsedHTML } from "@/shared/lib/html-react-parser";
 
 import defaultImg from "@images/mockImg.png";
-import { ParsedHTML } from "@/shared/lib/html-react-parser";
 
 interface ArticleBodyProps {
     article: Article;
@@ -12,6 +12,8 @@ interface ArticleBodyProps {
 }
 
 export const ArticleBody = ({ article, isExpanded }: ArticleBodyProps) => {
+    const TitleTag = isExpanded ? "h1" : "h2";
+
     return (
         <>
             <Image
@@ -23,13 +25,13 @@ export const ArticleBody = ({ article, isExpanded }: ArticleBodyProps) => {
             />
 
             <div>
-                <h2
+                <TitleTag
                     className={cn(
                         "text-h3 mb-6 text-2xl font-bold text-black md:text-3xl dark:text-white",
                     )}
                 >
                     {article.title}
-                </h2>
+                </TitleTag>
 
                 <div className="relative text-black dark:text-white">
                     <div
