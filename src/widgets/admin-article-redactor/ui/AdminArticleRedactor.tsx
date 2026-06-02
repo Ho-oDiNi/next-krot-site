@@ -42,6 +42,7 @@ export const AdminArticleRedactor = ({
     const [formData, setFormData] = useState<ArticleRedactorFormData>(article);
     const [status, setStatus] = useState<UpdateArticleResult | null>(null);
     const [previewImageFile, setPreviewImageFile] = useState<File | null>(null);
+    const [isMetaOpen, setIsMetaOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
 
     const updateField = useCallback(
@@ -96,6 +97,8 @@ export const AdminArticleRedactor = ({
                         originalSlug: formData.originalSlug,
                         slug: formData.slug,
                         title: formData.title,
+                        metaTitle: formData.metaTitle,
+                        metaDescription: formData.metaDescription,
                         previewImg: formData.previewImg || null,
                         previewImageFile,
                         mainText: formData.mainText,
@@ -156,6 +159,77 @@ export const AdminArticleRedactor = ({
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid gap-6 rounded-3xl bg-white p-6 dark:bg-gray-900">
                 <div className="grid gap-4 rounded-2xl bg-gray-50 text-sm text-gray-600 dark:bg-gray-900 dark:text-gray-300">
+                    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-950">
+                        <button
+                            type="button"
+                            onClick={() => setIsMetaOpen((prev) => !prev)}
+                            aria-expanded={isMetaOpen}
+                            aria-controls="article-meta-fields"
+                            className="flex w-full items-center justify-between gap-4 text-left"
+                        >
+                            <div>
+                                <span className="block text-sm font-semibold text-black dark:text-white">
+                                    Meta
+                                </span>
+
+                                <span className="mt-1 block text-xs text-gray-500 dark:text-gray-400">
+                                    Slug, Meta Title и Meta Description
+                                </span>
+                            </div>
+
+                            <ArrowDownIcon
+                                className={`h-5 w-5 shrink-0 text-gray-500 transition-transform dark:text-gray-300 ${
+                                    isMetaOpen ? "rotate-180" : ""
+                                }`}
+                            />
+                        </button>
+
+                        {isMetaOpen && (
+                            <div
+                                id="article-meta-fields"
+                                className="mt-4 grid gap-4"
+                            >
+                                <StyledInput
+                                    id="article-slug"
+                                    label="Slug"
+                                    type="text"
+                                    value={formData.slug}
+                                    onChange={(event) =>
+                                        updateField("slug", event.target.value)
+                                    }
+                                    required
+                                />
+
+                                <StyledTextarea
+                                    id="article-meta-title"
+                                    label="Meta Title"
+                                    value={formData.metaTitle}
+                                    onChange={(event) =>
+                                        updateField(
+                                            "metaTitle",
+                                            event.target.value,
+                                        )
+                                    }
+                                    required
+                                    rows={2}
+                                />
+
+                                <StyledTextarea
+                                    id="article-meta-description"
+                                    label="Meta Description"
+                                    value={formData.metaDescription}
+                                    onChange={(event) =>
+                                        updateField(
+                                            "metaDescription",
+                                            event.target.value,
+                                        )
+                                    }
+                                    required
+                                    rows={4}
+                                />
+                            </div>
+                        )}
+                    </div>
                     <label className="space-y-2">
                         <span className="block text-gray-400">Автор</span>
 
@@ -252,17 +326,6 @@ export const AdminArticleRedactor = ({
                     }
                     required
                     rows={2}
-                />
-
-                <StyledInput
-                    id="article-slug"
-                    label="Slug"
-                    type="text"
-                    value={formData.slug}
-                    onChange={(event) =>
-                        updateField("slug", event.target.value)
-                    }
-                    required
                 />
 
                 <div className="space-y-2 text-sm font-medium text-black dark:text-white">

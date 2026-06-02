@@ -4,6 +4,8 @@ import { Tag } from "@/entities/tag";
 export interface Article {
     id: number;
     slug: string;
+    metaTitle: string;
+    metaDescription: string;
     title: string;
     previewImg: string | null;
     likesCount: number;

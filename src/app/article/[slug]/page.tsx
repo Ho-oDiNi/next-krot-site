@@ -1,5 +1,6 @@
 import { getArticleBySlug } from "@/entities/article/api";
 import { ArticleCard } from "@/widgets/article-grid/ui/ArticleCard";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 interface ArticlePageProps {
@@ -7,6 +8,23 @@ interface ArticlePageProps {
         slug: string;
     }>;
 }
+
+export const generateMetadata = async ({
+    params,
+}: ArticlePageProps): Promise<Metadata> => {
+    const { slug } = await params;
+
+    const article = await getArticleBySlug(slug);
+
+    if (!article) {
+        return {};
+    }
+
+    return {
+        title: article.metaTitle,
+        description: article.metaDescription,
+    };
+};
 
 const ArticlePage = async ({ params }: ArticlePageProps) => {
     const { slug } = await params;

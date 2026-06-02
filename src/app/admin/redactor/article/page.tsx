@@ -24,6 +24,8 @@ const AdminArticleCreatePage = async () => {
                     originalSlug: undefined,
                     slug: "",
                     title: "",
+                    metaTitle: "",
+                    metaDescription: "",
                     previewImg: "",
                     mainText: "",
                     readingTime: "",
