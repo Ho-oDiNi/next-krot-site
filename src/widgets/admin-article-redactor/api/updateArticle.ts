@@ -36,6 +36,8 @@ const getArticlePreviewImageFile = (payload: UpdateArticlePayload) =>
 const normalizeArticlePayload = (payload: UpdateArticlePayload) => {
     const slug = payload.slug.trim();
     const title = payload.title.trim();
+    const metaTitle = payload.metaTitle.trim();
+    const metaDescription = payload.metaDescription.trim();
     const mainText = payload.mainText.trim();
     const previewImageFile = getArticlePreviewImageFile(payload);
     const uniqueTagIds = Array.from(new Set(payload.tagIds));
@@ -70,6 +72,8 @@ const normalizeArticlePayload = (payload: UpdateArticlePayload) => {
         data: {
             slug,
             title,
+            metaTitle,
+            metaDescription,
             previewImg: normalizeNullableString(payload.previewImg),
             mainText,
             readingTime: calculateReadingTime(mainText),

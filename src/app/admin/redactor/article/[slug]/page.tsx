@@ -40,6 +40,8 @@ const AdminArticleRedactorPage = async ({
                     originalSlug: article.slug,
                     slug: article.slug,
                     title: article.title,
+                    metaTitle: article.metaTitle,
+                    metaDescription: article.metaDescription,
                     previewImg: article.previewImg ?? "",
                     mainText: article.mainText,
                     readingTime: article.readingTime?.toString() ?? "",
