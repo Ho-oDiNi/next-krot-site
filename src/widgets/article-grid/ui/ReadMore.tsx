@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
-import { Article } from "@/entities/article";
 import { cn } from "@/shared/lib/cn";
 
 import LikeIcon from "@icons/like.svg";
 
+interface ReadMoreArticle {
+    id: number;
+    slug: string;
+    likesCount: number;
+}
+
 interface ReadMoreProps {
-    article: Article;
-    isExpanded: boolean;
-    onToggle: () => void;
+    article: ReadMoreArticle;
+    showArticleLink?: boolean;
 }
 
 const toggleLike = async ({
@@ -40,7 +45,10 @@ const toggleLike = async ({
     }>;
 };
 
-export const ReadMore = ({ article, isExpanded, onToggle }: ReadMoreProps) => {
+export const ReadMore = ({
+    article,
+    showArticleLink = true,
+}: ReadMoreProps) => {
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(article.likesCount);
     const [isLoading, setIsLoading] = useState(false);
@@ -72,16 +80,17 @@ export const ReadMore = ({ article, isExpanded, onToggle }: ReadMoreProps) => {
     };
 
     return (
-        <div className="flex-between">
-            <button
-                type="button"
-                onClick={onToggle}
-                className={cn(
-                    "inline-block rounded-full bg-gray-900 px-15 py-4 text-xs text-white transition hover:bg-gray-700 sm:px-20 dark:bg-white dark:text-black",
-                )}
-            >
-                {isExpanded ? "Свернуть" : "Читать дальше"}
-            </button>
+        <div className={showArticleLink ? "flex-between" : "flex justify-end"}>
+            {showArticleLink && (
+                <Link
+                    href={`/article/${article.slug}`}
+                    className={cn(
+                        "inline-block rounded-full bg-gray-900 px-15 py-4 text-xs text-white transition hover:bg-gray-700 sm:px-20 dark:bg-white dark:text-black",
+                    )}
+                >
+                    Читать далее
+                </Link>
+            )}
 
             <button
                 type="button"

@@ -21,6 +21,7 @@ const ArticlePage = async ({ params }: ArticlePageProps) => {
             article={article}
             author={article.author}
             tags={article.tags}
+            isFullArticle
         />
     );
 };
