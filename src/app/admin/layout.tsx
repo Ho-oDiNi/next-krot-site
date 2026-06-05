@@ -1,4 +1,4 @@
-import { auth } from "@/core/auth";
+import { auth, isAdminServerSide } from "@/core/auth";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
@@ -7,6 +7,11 @@ const AdminLayout = async ({ children }: { children: ReactNode }) => {
 
     if (!session) {
         redirect("/api/auth/signin?callbackUrl=/admin");
+    }
+
+    const isAdmin = await isAdminServerSide();
+    if (!isAdmin) {
+        redirect("/");
     }
 
     return children;
