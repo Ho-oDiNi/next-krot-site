@@ -32,6 +32,145 @@ interface AdminArticleRedactorProps {
     availableTags: Tag[];
 }
 
+const SLUG_MAX_LENGTH = 60;
+const META_DESCRIPTION_MAX_LENGTH = 160;
+
+const transliterationMap: Record<string, string> = {
+    а: "a",
+    б: "b",
+    в: "v",
+    г: "g",
+    д: "d",
+    е: "e",
+    ё: "e",
+    ж: "zh",
+    з: "z",
+    и: "i",
+    й: "y",
+    к: "k",
+    л: "l",
+    м: "m",
+    н: "n",
+    о: "o",
+    п: "p",
+    р: "r",
+    с: "s",
+    т: "t",
+    у: "u",
+    ф: "f",
+    х: "h",
+    ц: "ts",
+    ч: "ch",
+    ш: "sh",
+    щ: "sch",
+    ъ: "",
+    ы: "y",
+    ь: "",
+    э: "e",
+    ю: "yu",
+    я: "ya",
+};
+
+const normalizeText = (value: string) => value.replace(/\s+/g, " ").trim();
+
+const transliterate = (value: string) =>
+    value
+        .toLowerCase()
+        .split("")
+        .map((char) => transliterationMap[char] ?? char)
+        .join("");
+
+const trimSlugByLength = (slug: string) => {
+    if (slug.length <= SLUG_MAX_LENGTH) {
+        return slug;
+    }
+
+    const truncatedSlug = slug.slice(0, SLUG_MAX_LENGTH).replace(/-+$/g, "");
+    const lastSeparatorIndex = truncatedSlug.lastIndexOf("-");
+
+    return lastSeparatorIndex > 0
+        ? truncatedSlug.slice(0, lastSeparatorIndex)
+        : truncatedSlug;
+};
+
+const createSlugFromTitle = (title: string) => {
+    const slug = transliterate(title)
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/-{2,}/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+    return trimSlugByLength(slug);
+};
+
+const getFirstParagraphText = (html: string) => {
+    if (typeof DOMParser !== "undefined") {
+        const document = new DOMParser().parseFromString(html, "text/html");
+        const paragraphs = Array.from(document.body.querySelectorAll("p"));
+        const firstParagraph = paragraphs
+            .map((paragraph) => normalizeText(paragraph.textContent ?? ""))
+            .find(Boolean);
+
+        return firstParagraph ?? normalizeText(document.body.textContent ?? "");
+    }
+
+    const firstParagraphMatch = html.match(/<p[^>]*>(.*?)<\/p>/i);
+    const text = firstParagraphMatch?.[1] ?? html;
+
+    return normalizeText(text.replace(/<[^>]*>/g, " "));
+};
+
+const createMetaDescription = (mainText: string) => {
+    const firstParagraph = getFirstParagraphText(mainText);
+
+    if (firstParagraph.length <= META_DESCRIPTION_MAX_LENGTH) {
+        return firstParagraph;
+    }
+
+    const limitedDescription = firstParagraph.slice(
+        0,
+        META_DESCRIPTION_MAX_LENGTH,
+    );
+
+    const sentenceEndMatches = Array.from(
+        limitedDescription.matchAll(/[.!?…]+(?=[\s"'»”’\)\]]|$)/g),
+    );
+
+    const lastSentenceEndMatch = sentenceEndMatches.at(-1);
+
+    if (lastSentenceEndMatch?.index !== undefined) {
+        let endIndex =
+            lastSentenceEndMatch.index + lastSentenceEndMatch[0].length;
+
+        while (
+            endIndex < firstParagraph.length &&
+            endIndex < META_DESCRIPTION_MAX_LENGTH &&
+            /["'»”’\)\]]/.test(firstParagraph[endIndex])
+        ) {
+            endIndex += 1;
+        }
+
+        return firstParagraph.slice(0, endIndex).trim();
+    }
+
+    const lastSpaceIndex = limitedDescription.lastIndexOf(" ");
+
+    return (
+        lastSpaceIndex > 0
+            ? limitedDescription.slice(0, lastSpaceIndex)
+            : limitedDescription
+    ).trim();
+};
+
+const fillEmptyMetaFields = (data: ArticleRedactorFormData) => ({
+    ...data,
+    slug: data.slug.trim() || createSlugFromTitle(data.title),
+    metaTitle: data.metaTitle.trim() || data.title.trim(),
+    metaDescription:
+        data.metaDescription.trim() || createMetaDescription(data.mainText),
+});
+
 export const AdminArticleRedactor = ({
     article,
     authors,
@@ -90,21 +229,24 @@ export const AdminArticleRedactor = ({
     const saveArticle = (isPublished: boolean) => {
         setStatus(null);
 
+        const articleToSave = fillEmptyMetaFields(formData);
+        setFormData(articleToSave);
+
         startTransition(() => {
             void (async () => {
                 try {
                     const result = await updateArticle({
-                        originalSlug: formData.originalSlug,
-                        slug: formData.slug,
-                        title: formData.title,
-                        metaTitle: formData.metaTitle,
-                        metaDescription: formData.metaDescription,
-                        previewImg: formData.previewImg || null,
+                        originalSlug: articleToSave.originalSlug,
+                        slug: articleToSave.slug,
+                        title: articleToSave.title,
+                        metaTitle: articleToSave.metaTitle,
+                        metaDescription: articleToSave.metaDescription,
+                        previewImg: articleToSave.previewImg || null,
                         previewImageFile,
-                        mainText: formData.mainText,
+                        mainText: articleToSave.mainText,
                         isPublished,
-                        authorId: formData.authorId,
-                        tagIds: formData.tagIds,
+                        authorId: articleToSave.authorId,
+                        tagIds: articleToSave.tagIds,
                     });
 
                     setStatus(result);
@@ -114,9 +256,10 @@ export const AdminArticleRedactor = ({
 
                         setFormData((prev) => ({
                             ...prev,
+                            ...articleToSave,
                             isPublished,
                             originalSlug: result.slug ?? prev.originalSlug,
-                            slug: result.slug ?? prev.slug,
+                            slug: result.slug ?? articleToSave.slug,
                         }));
 
                         router.replace(
@@ -197,7 +340,6 @@ export const AdminArticleRedactor = ({
                                     onChange={(event) =>
                                         updateField("slug", event.target.value)
                                     }
-                                    required
                                 />
 
                                 <StyledTextarea
@@ -210,7 +352,6 @@ export const AdminArticleRedactor = ({
                                             event.target.value,
                                         )
                                     }
-                                    required
                                     rows={2}
                                 />
 
@@ -224,7 +365,6 @@ export const AdminArticleRedactor = ({
                                             event.target.value,
                                         )
                                     }
-                                    required
                                     rows={4}
                                 />
                             </div>
