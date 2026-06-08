@@ -3,7 +3,11 @@ import { promises as fs } from "fs";
 import path from "path";
 
 const PUBLIC_IMAGES_PATH = "/upload";
-const DEFAULT_PUBLIC_IMAGES_DIR = path.join(process.cwd(), "public", "upload");
+const DEFAULT_PUBLIC_IMAGES_DIR = path.join(
+    process.cwd(),
+    "storage",
+    "public-images",
+);
 
 const resolvePublicImagesDir = (): string => {
     const configuredDir = process.env.PUBLIC_IMAGES_DIR?.trim();
