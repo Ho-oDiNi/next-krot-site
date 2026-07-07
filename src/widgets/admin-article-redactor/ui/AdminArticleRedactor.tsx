@@ -17,9 +17,19 @@ import {
 } from "@/shared/lib/file-storage/config";
 import QuillEditor from "@/shared/lib/react-quill";
 import StatusMessage from "@/shared/ui/StatusMessage";
-import { StyledInput, StyledTextarea } from "@/shared/ui/StyledInput";
+import {
+    DateInput,
+    StyledInput,
+    StyledTextarea,
+    TimeInput,
+} from "@/shared/ui/StyledInput";
 import { updateArticle } from "@/widgets/admin-article-redactor/api/updateArticle";
-import { getCurrentMoscowDateTimeInput } from "@/widgets/admin-article-redactor/lib/moscowPublicationDate";
+import {
+    combineMoscowPublicationDateTime,
+    getCurrentMoscowDateTimeInput,
+    getPublicationDateInputValue,
+    getPublicationTimeInputValue,
+} from "@/widgets/admin-article-redactor/lib/moscowPublicationDate";
 import type {
     ArticleRedactorFormData,
     UpdateArticleResult,
@@ -193,6 +203,30 @@ export const AdminArticleRedactor = ({
             setFormData((prev) => ({
                 ...prev,
                 [field]: value,
+            }));
+        },
+        [],
+    );
+
+    const updatePublicationDateTime = useCallback(
+        ({
+            dateValue,
+            timeValue,
+        }: {
+            dateValue?: string;
+            timeValue?: string;
+        }) => {
+            setFormData((prev) => ({
+                ...prev,
+                publishedAtMoscow: combineMoscowPublicationDateTime({
+                    currentDateTimeValue: prev.publishedAtMoscow,
+                    dateValue:
+                        dateValue ??
+                        getPublicationDateInputValue(prev.publishedAtMoscow),
+                    timeValue:
+                        timeValue ??
+                        getPublicationTimeInputValue(prev.publishedAtMoscow),
+                }),
             }));
         },
         [],
@@ -412,15 +446,29 @@ export const AdminArticleRedactor = ({
                         </div>
                     </label>
 
-                    <StyledInput
-                        id="article-published-at"
-                        label="Дата и время публикации (МСК)"
-                        type="datetime-local"
-                        value={formData.publishedAtMoscow}
-                        onChange={(event) =>
-                            updateField("publishedAtMoscow", event.target.value)
-                        }
-                    />
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <DateInput
+                            id="article-publication-date"
+                            label="Дата публикации (МСК)"
+                            value={getPublicationDateInputValue(
+                                formData.publishedAtMoscow,
+                            )}
+                            onChange={(dateValue) =>
+                                updatePublicationDateTime({ dateValue })
+                            }
+                        />
+
+                        <TimeInput
+                            id="article-publication-time"
+                            label="Время публикации (МСК)"
+                            value={getPublicationTimeInputValue(
+                                formData.publishedAtMoscow,
+                            )}
+                            onChange={(timeValue) =>
+                                updatePublicationDateTime({ timeValue })
+                            }
+                        />
+                    </div>
 
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                         Если указать будущее время и нажать «Опубликовать»,
