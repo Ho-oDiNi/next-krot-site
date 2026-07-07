@@ -26,7 +26,6 @@ import {
 import { updateArticle } from "@/widgets/admin-article-redactor/api/updateArticle";
 import {
     combineMoscowPublicationDateTime,
-    getCurrentMoscowDateTimeInput,
     getPublicationDateInputValue,
     getPublicationTimeInputValue,
 } from "@/widgets/admin-article-redactor/lib/moscowPublicationDate";
@@ -264,13 +263,7 @@ export const AdminArticleRedactor = ({
     const saveArticle = (isPublished: boolean) => {
         setStatus(null);
 
-        const articleToSave = fillEmptyMetaFields({
-            ...formData,
-            publishedAtMoscow:
-                isPublished && !formData.publishedAtMoscow
-                    ? getCurrentMoscowDateTimeInput()
-                    : formData.publishedAtMoscow,
-        });
+        const articleToSave = fillEmptyMetaFields(formData);
         setFormData(articleToSave);
 
         startTransition(() => {
