@@ -2,6 +2,18 @@ import { prisma } from "@/shared/lib/prisma";
 import { ArticleWithRelations } from "../model";
 import { getPublishedArticleWhere } from "../lib";
 
+const clearPublishedScheduleDates = async () => {
+    await prisma.article.updateMany({
+        where: {
+            isPublished: true,
+            publishedAt: { lte: new Date() },
+        },
+        data: {
+            publishedAt: null,
+        },
+    });
+};
+
 interface GetArticlesParams {
     page: number;
     limit: number;
@@ -18,6 +30,8 @@ export const getArticles = async ({
     filters,
     isPublished,
 }: GetArticlesParams) => {
+    await clearPublishedScheduleDates();
+
     return prisma.article.findMany({
         where: {
             authorId: filters?.authorId,
@@ -50,6 +64,8 @@ export const getArticleBySlug = async (
     slug: string,
     onlyAvailable = false,
 ): Promise<ArticleWithRelations | null> => {
+    await clearPublishedScheduleDates();
+
     return prisma.article.findFirst({
         where: {
             slug,
@@ -63,6 +79,8 @@ export const getArticleBySlug = async (
 };
 
 export const getAllPublishedArticles = async () => {
+    await clearPublishedScheduleDates();
+
     return prisma.article.findMany({
         where: getPublishedArticleWhere(),
         select: {
