@@ -80,6 +80,21 @@ const normalizeNullableString = (value: string | null) => {
     return trimmedValue ? trimmedValue : null;
 };
 
+const getPublicationDateForSave = (
+    isPublished: boolean,
+    publishedAt: Date | null,
+) => {
+    if (!isPublished) {
+        return publishedAt;
+    }
+
+    if (!publishedAt || publishedAt.getTime() <= Date.now()) {
+        return null;
+    }
+
+    return publishedAt;
+};
+
 const calculateReadingTime = (mainText: string): number =>
     Math.max(1, Math.ceil(mainText.length / READING_CHARACTERS_PER_MINUTE));
 
@@ -134,9 +149,10 @@ const normalizeArticlePayload = (payload: UpdateArticlePayload) => {
             mainText,
             readingTime: calculateReadingTime(mainText),
             isPublished: payload.isPublished,
-            publishedAt: payload.isPublished
-                ? (publishedAt ?? new Date())
-                : publishedAt,
+            publishedAt: getPublicationDateForSave(
+                payload.isPublished,
+                publishedAt,
+            ),
             authorId: payload.authorId,
             tags: {
                 set: uniqueTagIds.map((id) => ({ id })),
