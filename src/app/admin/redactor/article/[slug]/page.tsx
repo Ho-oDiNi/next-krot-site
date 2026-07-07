@@ -3,6 +3,7 @@ import { getAuthors } from "@/entities/author/api";
 import { getTags } from "@/entities/tag/api";
 import { cn } from "@/shared/lib/cn";
 import { AdminArticleRedactor } from "@/widgets/admin-article-redactor";
+import { formatDateToMoscowDateTimeInput } from "@/widgets/admin-article-redactor/lib/moscowPublicationDate";
 import { notFound } from "next/navigation";
 
 interface AdminArticleRedactorPageProps {
@@ -46,6 +47,9 @@ const AdminArticleRedactorPage = async ({
                     mainText: article.mainText,
                     readingTime: article.readingTime?.toString() ?? "",
                     isPublished: article.isPublished,
+                    publishedAtMoscow: formatDateToMoscowDateTimeInput(
+                        article.publishedAt,
+                    ),
                     authorId: article.author.id,
                     tagIds: article.tags.map((tag) => tag.id),
                 }}

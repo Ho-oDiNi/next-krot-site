@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { isArticleAvailableForPublication } from "@/entities/article/lib";
 import type { ArticleWithRelations } from "@/entities/article/model";
 import { cn } from "@/shared/lib/cn";
 import PencilIcon from "@icons/pencil.svg";
@@ -14,7 +15,15 @@ export const AdminArticleGridItem = ({
     article,
 }: AdminArticleGridItemProps) => {
     const editHref = `/admin/redactor/article/${article.slug}`;
-    const statusText = article.isPublished ? "Published" : "Draft";
+    const isAvailable = isArticleAvailableForPublication(
+        article.isPublished,
+        article.publishedAt,
+    );
+    const statusText = article.isPublished
+        ? isAvailable
+            ? "Published"
+            : "Scheduled"
+        : "Draft";
     const tagList = article.tags.map((tag) => `#${tag.name}`).join(" / ");
 
     return (
@@ -54,9 +63,11 @@ export const AdminArticleGridItem = ({
                 <p
                     className={cn(
                         "mt-1 text-sm leading-tight sm:text-lg",
-                        article.isPublished
+                        isAvailable
                             ? "text-emerald-600 dark:text-emerald-400"
-                            : "text-pink-600 dark:text-pink-400",
+                            : article.isPublished
+                              ? "text-amber-600 dark:text-amber-400"
+                              : "text-pink-600 dark:text-pink-400",
                     )}
                 >
                     {statusText}

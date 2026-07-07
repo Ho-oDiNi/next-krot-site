@@ -30,6 +30,7 @@ const AdminArticleCreatePage = async () => {
                     mainText: "",
                     readingTime: "",
                     isPublished: false,
+                    publishedAtMoscow: "",
                     authorId: authors[0]?.id ?? 0,
                     tagIds: [],
                 }}

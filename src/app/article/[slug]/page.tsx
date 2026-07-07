@@ -14,7 +14,7 @@ export const generateMetadata = async ({
 }: ArticlePageProps): Promise<Metadata> => {
     const { slug } = await params;
 
-    const article = await getArticleBySlug(slug);
+    const article = await getArticleBySlug(slug, true);
 
     if (!article) {
         return {};
@@ -29,7 +29,7 @@ export const generateMetadata = async ({
 const ArticlePage = async ({ params }: ArticlePageProps) => {
     const { slug } = await params;
 
-    const article = await getArticleBySlug(slug);
+    const article = await getArticleBySlug(slug, true);
 
     if (!article) {
         notFound();
