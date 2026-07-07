@@ -84,12 +84,14 @@ const getPublicationDateForSave = (
     isPublished: boolean,
     publishedAt: Date | null,
 ) => {
-    if (!isPublished) {
+    if (!isPublished || !publishedAt) {
         return publishedAt;
     }
 
-    if (!publishedAt || publishedAt.getTime() <= Date.now()) {
-        return null;
+    if (publishedAt.getTime() < Date.now()) {
+        throw new Error(
+            "Отложенная публикация не может быть раньше текущего времени",
+        );
     }
 
     return publishedAt;

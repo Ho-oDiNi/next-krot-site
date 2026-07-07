@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 
 import { cn } from "@/shared/lib/cn";
 
-import calendarIcon from "@icons/calendar-blur.svg";
+import CalendarIcon from "@icons/calendar-blur.svg";
 
 import styles from "./InputField.module.css";
 
@@ -142,7 +142,7 @@ export const DateInput = ({
                 onClick={openPicker}
                 aria-label="Выбрать дату"
             >
-                <Image src={calendarIcon} alt="" aria-hidden="true" />
+                <CalendarIcon alt="" aria-hidden="true" />
             </button>
 
             <input
