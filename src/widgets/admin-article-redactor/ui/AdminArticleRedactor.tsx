@@ -19,6 +19,7 @@ import QuillEditor from "@/shared/lib/react-quill";
 import StatusMessage from "@/shared/ui/StatusMessage";
 import { StyledInput, StyledTextarea } from "@/shared/ui/StyledInput";
 import { updateArticle } from "@/widgets/admin-article-redactor/api/updateArticle";
+import { getCurrentMoscowDateTimeInput } from "@/widgets/admin-article-redactor/lib/moscowPublicationDate";
 import type {
     ArticleRedactorFormData,
     UpdateArticleResult,
@@ -229,7 +230,13 @@ export const AdminArticleRedactor = ({
     const saveArticle = (isPublished: boolean) => {
         setStatus(null);
 
-        const articleToSave = fillEmptyMetaFields(formData);
+        const articleToSave = fillEmptyMetaFields({
+            ...formData,
+            publishedAtMoscow:
+                isPublished && !formData.publishedAtMoscow
+                    ? getCurrentMoscowDateTimeInput()
+                    : formData.publishedAtMoscow,
+        });
         setFormData(articleToSave);
 
         startTransition(() => {
@@ -245,6 +252,7 @@ export const AdminArticleRedactor = ({
                         previewImageFile,
                         mainText: articleToSave.mainText,
                         isPublished,
+                        publishedAtMoscow: articleToSave.publishedAtMoscow,
                         authorId: articleToSave.authorId,
                         tagIds: articleToSave.tagIds,
                     });
@@ -258,6 +266,7 @@ export const AdminArticleRedactor = ({
                             ...prev,
                             ...articleToSave,
                             isPublished,
+                            publishedAtMoscow: articleToSave.publishedAtMoscow,
                             originalSlug: result.slug ?? prev.originalSlug,
                             slug: result.slug ?? articleToSave.slug,
                         }));
@@ -402,6 +411,22 @@ export const AdminArticleRedactor = ({
                             <ArrowDownIcon className="pointer-events-none absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-gray-500 dark:text-gray-300" />
                         </div>
                     </label>
+
+                    <StyledInput
+                        id="article-published-at"
+                        label="Дата и время публикации (МСК)"
+                        type="datetime-local"
+                        value={formData.publishedAtMoscow}
+                        onChange={(event) =>
+                            updateField("publishedAtMoscow", event.target.value)
+                        }
+                    />
+
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Если указать будущее время и нажать «Опубликовать»,
+                        статья появится на сайте только после наступления этого
+                        времени по Москве.
+                    </p>
 
                     <div className="space-y-2">
                         <span className="block text-gray-400">Темы</span>

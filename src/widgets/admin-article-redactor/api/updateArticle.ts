@@ -19,6 +19,61 @@ import type {
 
 const READING_CHARACTERS_PER_MINUTE = 1400;
 
+const MOSCOW_TIME_ZONE = "Europe/Moscow";
+const MOSCOW_UTC_OFFSET_HOURS = 3;
+const MOSCOW_DATE_TIME_PATTERN = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
+
+const parseMoscowDateTime = (value: string) => {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue) {
+        return null;
+    }
+
+    const matchedDateTime = trimmedValue.match(MOSCOW_DATE_TIME_PATTERN);
+
+    if (!matchedDateTime) {
+        throw new Error("Укажите дату и время публикации в корректном формате");
+    }
+
+    const [, year, month, day, hour, minute] = matchedDateTime.map(Number);
+    const utcTimestamp = Date.UTC(
+        year,
+        month - 1,
+        day,
+        hour - MOSCOW_UTC_OFFSET_HOURS,
+        minute,
+    );
+
+    const parsedDate = new Date(utcTimestamp);
+
+    const normalizedMoscowValue = new Intl.DateTimeFormat("ru-RU", {
+        timeZone: MOSCOW_TIME_ZONE,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    })
+        .formatToParts(parsedDate)
+        .reduce<Record<string, string>>((dateParts, part) => {
+            dateParts[part.type] = part.value;
+            return dateParts;
+        }, {});
+
+    const normalizedDateTime = `${normalizedMoscowValue.year}-${normalizedMoscowValue.month}-${normalizedMoscowValue.day}T${normalizedMoscowValue.hour}:${normalizedMoscowValue.minute}`;
+
+    if (
+        Number.isNaN(parsedDate.getTime()) ||
+        normalizedDateTime !== trimmedValue
+    ) {
+        throw new Error("Укажите корректную дату публикации");
+    }
+
+    return parsedDate;
+};
+
 const normalizeNullableString = (value: string | null) => {
     const trimmedValue = value?.trim();
 
@@ -40,6 +95,7 @@ const normalizeArticlePayload = (payload: UpdateArticlePayload) => {
     const metaDescription = payload.metaDescription.trim();
     const mainText = payload.mainText.trim();
     const previewImageFile = getArticlePreviewImageFile(payload);
+    const publishedAt = parseMoscowDateTime(payload.publishedAtMoscow);
     const uniqueTagIds = Array.from(new Set(payload.tagIds));
 
     if (!slug) {
@@ -78,6 +134,9 @@ const normalizeArticlePayload = (payload: UpdateArticlePayload) => {
             mainText,
             readingTime: calculateReadingTime(mainText),
             isPublished: payload.isPublished,
+            publishedAt: payload.isPublished
+                ? (publishedAt ?? new Date())
+                : publishedAt,
             authorId: payload.authorId,
             tags: {
                 set: uniqueTagIds.map((id) => ({ id })),

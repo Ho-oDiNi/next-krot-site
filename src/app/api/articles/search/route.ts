@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { getPublishedArticleWhere } from "@/entities/article/lib";
 import { prisma } from "@/shared/lib/prisma";
 
 const MIN_SEARCH_LENGTH = 5;
@@ -14,6 +15,7 @@ export const GET = async (request: NextRequest) => {
 
     const articles = await prisma.article.findMany({
         where: {
+            ...getPublishedArticleWhere(),
             title: {
                 startsWith: query,
                 mode: "insensitive",

@@ -1,5 +1,6 @@
 import { prisma } from "@/shared/lib/prisma";
 import { ArticleWithRelations } from "../model";
+import { getPublishedArticleWhere } from "../lib";
 
 interface GetArticlesParams {
     page: number;
@@ -27,7 +28,9 @@ export const getArticles = async ({
                       },
                   }
                 : undefined,
-            isPublished,
+            ...(isPublished === true
+                ? getPublishedArticleWhere()
+                : { isPublished }),
         },
         include: {
             author: true,
@@ -35,16 +38,22 @@ export const getArticles = async ({
         },
         skip: (page - 1) * limit,
         take: limit,
-        orderBy: [{ isPublished: "asc" }, { updatedAt: "desc" }],
+        orderBy: [
+            { isPublished: "asc" },
+            { publishedAt: "desc" },
+            { updatedAt: "desc" },
+        ],
     });
 };
 
 export const getArticleBySlug = async (
     slug: string,
+    onlyAvailable = false,
 ): Promise<ArticleWithRelations | null> => {
-    return prisma.article.findUnique({
+    return prisma.article.findFirst({
         where: {
             slug,
+            ...(onlyAvailable ? getPublishedArticleWhere() : {}),
         },
         include: {
             author: true,
@@ -55,15 +64,13 @@ export const getArticleBySlug = async (
 
 export const getAllPublishedArticles = async () => {
     return prisma.article.findMany({
-        where: {
-            isPublished: true,
-        },
+        where: getPublishedArticleWhere(),
         select: {
             slug: true,
             updatedAt: true,
         },
         orderBy: {
-            updatedAt: "desc",
+            publishedAt: "desc",
         },
     });
 };

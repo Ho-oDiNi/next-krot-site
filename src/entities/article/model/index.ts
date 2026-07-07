@@ -11,6 +11,7 @@ export interface Article {
     likesCount: number;
     mainText: string;
     isPublished: boolean;
+    publishedAt: Date | null;
     readingTime: number | null;
     createdAt: Date;
     updatedAt: Date;
