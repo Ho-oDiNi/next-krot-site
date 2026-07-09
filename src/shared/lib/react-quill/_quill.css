@@ -236,3 +236,23 @@
 .ql-rendered-content .ql-expert-quote__delete {
   display: none;
 }
+
+/* Dark theme: имя и описание цитаты */
+.dark .ql-editor .ql-expert-quote__description,
+.dark .ql-editor .ql-expert-quote__name,
+.dark .ql-rendered-content .ql-expert-quote__description,
+.dark .ql-rendered-content .ql-expert-quote__name {
+  color: #ffffff;
+}
+
+/* Dark theme: placeholder для описания и имени */
+.dark .ql-editor .ql-expert-quote__description[data-empty="true"]::before,
+.dark .ql-editor .ql-expert-quote__name[data-empty="true"]::before {
+  color: #b8c1ce;
+}
+
+/* Dark theme: сам блок автора, чтобы текст читался на тёмном фоне */
+.dark .ql-editor .ql-expert-quote__author,
+.dark .ql-rendered-content .ql-expert-quote__author {
+  color: #ffffff;
+}
