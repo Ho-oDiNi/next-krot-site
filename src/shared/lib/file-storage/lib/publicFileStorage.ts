@@ -3,6 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 
 const PUBLIC_IMAGES_PATH = "/upload";
+
 const DEFAULT_PUBLIC_IMAGES_DIR = path.join(
     process.cwd(),
     "storage",
@@ -75,7 +76,7 @@ export const resolvePublicImagePath = (publicUrl: string): string | null => {
 export const savePublicImage = async (file: File): Promise<string> => {
     await ensurePublicImagesDir();
 
-    const extension = path.extname(file.name) || ".bin";
+    const extension = path.extname(file.name).toLowerCase() || ".bin";
     const baseName = sanitizeFileBase(file.name);
     const fileName = `${baseName}-${Date.now()}-${crypto.randomUUID()}${extension}`;
     const filePath = path.join(resolvePublicImagesDir(), fileName);

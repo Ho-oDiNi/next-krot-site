@@ -4,36 +4,235 @@
   font-style: normal;
 }
 
-.ql-editor {
+.ql-editor,
+.ql-rendered-content {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
 
-  ul,
-  ol {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+.ql-editor ul,
+.ql-editor ol,
+.ql-rendered-content ul,
+.ql-rendered-content ol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-  li {
-    font-size: 1rem;
-    line-height: 1.5;
-  }
+.ql-editor li,
+.ql-editor p,
+.ql-editor a,
+.ql-rendered-content li,
+.ql-rendered-content p,
+.ql-rendered-content a {
+  font-size: 1rem;
+  line-height: 1.5;
+}
 
-  p {
-    font-size: 1rem;
-    line-height: 1.5;
-  }
+.ql-editor a,
+.ql-rendered-content a {
+  color: oklch(54.6% 0.245 262.881);
+}
 
-  a {
-    font-size: 1rem;
-    line-height: 1.5;
-    color: oklch(54.6% 0.245 262.881);
-    &:hover {
-      @media (hover: hover) {
-        opacity: 70%;
-      }
-    }
+.ql-editor a:hover,
+.ql-rendered-content a:hover {
+  @media (hover: hover) {
+    opacity: 70%;
   }
+}
+
+.ql-toolbar .ql-expertQuote {
+  width: auto !important;
+  min-width: 64px;
+}
+
+.ql-toolbar .ql-expertQuote::before {
+  content: "Цитата";
+  font-size: 12px;
+}
+
+.ql-editor .ql-expert-quote,
+.ql-rendered-content .ql-expert-quote {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 760px;
+  margin: 8px 0 16px;
+}
+
+.ql-editor .ql-expert-quote__bubble,
+.ql-rendered-content .ql-expert-quote__bubble {
+  position: relative;
+  min-height: 72px;
+  padding: 20px 24px;
+  border-radius: 12px;
+  background: #cfdae8;
+  color: #20242b;
+  font-size: 18px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  outline: none;
+}
+
+.ql-editor .ql-expert-quote__bubble {
+  cursor: text;
+}
+
+.ql-rendered-content .ql-expert-quote__bubble {
+  cursor: default;
+}
+
+.ql-editor .ql-expert-quote__bubble[data-empty="true"]::before {
+  content: attr(data-placeholder);
+  color: #6f7b8c;
+}
+
+.ql-editor .ql-expert-quote__bubble::after,
+.ql-rendered-content .ql-expert-quote__bubble::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  bottom: -16px;
+  width: 0;
+  height: 0;
+  border-top: 18px solid #cfdae8;
+  border-right: 18px solid transparent;
+}
+
+.ql-editor .ql-expert-quote__author,
+.ql-rendered-content .ql-expert-quote__author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 8px;
+}
+
+.ql-editor .ql-expert-quote__avatar-button,
+.ql-rendered-content .ql-expert-quote__avatar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #d7e1ef;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ql-editor .ql-expert-quote__avatar-button {
+  cursor: pointer;
+}
+
+.ql-editor .ql-expert-quote__avatar-button:hover {
+  opacity: 0.8;
+}
+
+.ql-rendered-content .ql-expert-quote__avatar-button {
+  cursor: default;
+  pointer-events: none;
+}
+
+.ql-editor .ql-expert-quote__avatar,
+.ql-rendered-content .ql-expert-quote__avatar {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.ql-editor .ql-expert-quote__meta,
+.ql-rendered-content .ql-expert-quote__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ql-editor .ql-expert-quote__description,
+.ql-editor .ql-expert-quote__name,
+.ql-rendered-content .ql-expert-quote__description,
+.ql-rendered-content .ql-expert-quote__name {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 120px;
+  outline: none;
+}
+
+.ql-editor .ql-expert-quote__description,
+.ql-editor .ql-expert-quote__name {
+  cursor: text;
+}
+
+.ql-rendered-content .ql-expert-quote__description,
+.ql-rendered-content .ql-expert-quote__name {
+  cursor: default;
+}
+
+.ql-editor .ql-expert-quote__description,
+.ql-rendered-content .ql-expert-quote__description {
+  color: #20242b;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.ql-editor .ql-expert-quote__name,
+.ql-rendered-content .ql-expert-quote__name {
+  color: #20242b;
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.ql-editor .ql-expert-quote__description[data-empty="true"]::before,
+.ql-editor .ql-expert-quote__name[data-empty="true"]::before {
+  content: attr(data-placeholder);
+  flex-shrink: 0;
+  color: #8c95a3;
+  font-weight: 400;
+  pointer-events: none;
+}
+
+.ql-editor .ql-expert-quote__delete {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #20242b;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.ql-editor .ql-expert-quote:hover .ql-expert-quote__delete,
+.ql-editor .ql-expert-quote:focus-within .ql-expert-quote__delete {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ql-editor .ql-expert-quote__delete:hover {
+  opacity: 0.8;
+}
+
+.ql-rendered-content .ql-expert-quote__delete {
+  display: none;
 }

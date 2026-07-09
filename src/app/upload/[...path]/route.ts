@@ -1,90 +1,52 @@
 import { promises as fs } from "fs";
 import path from "path";
 
+import { NextResponse } from "next/server";
+import { resolvePublicImagePath } from "@/shared/lib/file-storage";
+
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
-const DEFAULT_PUBLIC_IMAGES_DIR = path.join(
-    process.cwd(),
-    "storage",
-    "public-images",
-);
-
-const resolvePublicImagesDir = (): string => {
-    const configuredDir = process.env.PUBLIC_IMAGES_DIR?.trim();
-
-    if (!configuredDir) {
-        return DEFAULT_PUBLIC_IMAGES_DIR;
-    }
-
-    return path.isAbsolute(configuredDir)
-        ? configuredDir
-        : path.resolve(process.cwd(), configuredDir);
+const CONTENT_TYPES: Record<string, string> = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".webp": "image/webp",
+    ".gif": "image/gif",
+    ".svg": "image/svg+xml",
+    ".avif": "image/avif",
 };
 
-const getContentType = (filePath: string): string => {
-    const ext = path.extname(filePath).toLowerCase();
+interface UploadRouteContext {
+    params:
+        | {
+              path: string[];
+          }
+        | Promise<{
+              path: string[];
+          }>;
+}
 
-    switch (ext) {
-        case ".png":
-            return "image/png";
-        case ".jpg":
-        case ".jpeg":
-            return "image/jpeg";
-        case ".webp":
-            return "image/webp";
-        case ".gif":
-            return "image/gif";
-        case ".svg":
-            return "image/svg+xml";
-        default:
-            return "application/octet-stream";
-    }
-};
+export async function GET(_request: Request, context: UploadRouteContext) {
+    const params = await context.params;
+    const publicUrl = `/upload/${params.path.join("/")}`;
+    const filePath = resolvePublicImagePath(publicUrl);
 
-type RouteContext = {
-    params: Promise<{
-        path: string[];
-    }>;
-};
-
-export async function GET(
-    _request: Request,
-    context: RouteContext,
-): Promise<Response> {
-    const { path: segments } = await context.params;
-
-    if (!segments?.length) {
-        return new Response("Not found", { status: 404 });
-    }
-
-    const baseDir = resolvePublicImagesDir();
-    const relativePath = segments.join("/");
-    const filePath = path.resolve(baseDir, relativePath);
-
-    const normalizedBaseDir = baseDir.endsWith(path.sep)
-        ? baseDir
-        : `${baseDir}${path.sep}`;
-
-    if (!filePath.startsWith(normalizedBaseDir)) {
-        return new Response("Forbidden", { status: 403 });
+    if (!filePath) {
+        return new NextResponse("Not found", { status: 404 });
     }
 
     try {
-        const file = await fs.readFile(filePath);
+        const buffer = await fs.readFile(filePath);
+        const ext = path.extname(filePath).toLowerCase();
+        const contentType = CONTENT_TYPES[ext] ?? "application/octet-stream";
 
-        return new Response(file, {
-            status: 200,
+        return new NextResponse(new Uint8Array(buffer), {
             headers: {
-                "Content-Type": getContentType(filePath),
+                "Content-Type": contentType,
                 "Cache-Control": "public, max-age=31536000, immutable",
             },
         });
-    } catch (error) {
-        if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-            return new Response("Not found", { status: 404 });
-        }
-
-        throw error;
+    } catch {
+        return new NextResponse("Not found", { status: 404 });
     }
 }
