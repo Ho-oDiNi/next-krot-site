@@ -19,3 +19,8 @@ krot.media {
 
   reverse_proxy web:3000
 }
+
+83-222-17-40.ru {
+	encode zstd gzip
+	reverse_proxy zarplata-subscribe-bot:8000
+}

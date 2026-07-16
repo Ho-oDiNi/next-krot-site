@@ -6,13 +6,11 @@ services:
     entrypoint: ["/app/docker/entrypoint.sh"]
     command: ["node", "server.js"]
 
-    # Значения переменных попадут ВНУТРЬ контейнера web
     env_file:
       - ${HOME}/env/next-krot-site/.env.production
       - ${HOME}/env/next-krot-site/.env.local
 
     environment:
-      # Подключение к БД по внутреннему имени сервиса
       PG_HOST: db
       PG_PORT: 5432
       DATABASE_URL: "postgresql://${PG_USER}:${PG_PASSWORD}@db:5432/${PG_DB}?schema=public"
@@ -25,6 +23,14 @@ services:
       db:
         condition: service_healthy
 
+    volumes:
+      - public-images:/app/storage/public-images
+
+    networks:
+      krot-internal:
+        aliases:
+          - krot-web
+
     logging:
       driver: json-file
       options:
@@ -33,26 +39,26 @@ services:
 
     restart: unless-stopped
 
-    volumes:
-      - public-images:/app/storage/public-images
-
   db:
-    # если базовый файл уже задаёт image/volumes — можно оставить тут только overrides
     image: postgres:18
-    environment:
-      POSTGRES_DB: ${PG_DB:-krot}
-      POSTGRES_USER: ${PG_USER:-postgres}
-      POSTGRES_PASSWORD: ${PG_PASSWORD:-postgres}
+
     env_file:
       - ${HOME}/env/next-krot-site/.env.production
       - ${HOME}/env/next-krot-site/.env.local
 
-    # наружу БД обычно не открываем; если нужно — закомментируй
+    environment:
+      POSTGRES_DB: ${PG_DB:-krot}
+      POSTGRES_USER: ${PG_USER:-postgres}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-postgres}
+
     ports:
       - "${PG_HOST_OUT:-127.0.0.1}:${PG_PORT_OUT:-6543}:5432"
 
     volumes:
       - postgres-data:/var/lib/postgresql
+
+    networks:
+      - krot-internal
 
     healthcheck:
       test:
@@ -75,23 +81,30 @@ services:
 
   caddy:
     image: caddy:2.10.2-alpine
+
     ports:
       - "80:80"
       - "443:443"
+      - "443:443/udp"
+
     environment:
       ACME_AGREE: "true"
+
+    env_file:
+      - ${HOME}/env/next-krot-site/.env.production
 
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
 
-    env_file:
-      - ${HOME}/env/next-krot-site/.env.production
-
     depends_on:
       web:
         condition: service_started
+
+    networks:
+      - krot-internal
+      - caddy-public
 
     logging:
       driver: json-file
@@ -106,3 +119,10 @@ volumes:
   caddy-data:
   caddy-config:
   public-images:
+
+networks:
+  krot-internal:
+    internal: true
+
+  caddy-public:
+    external: true
