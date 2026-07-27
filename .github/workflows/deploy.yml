@@ -80,8 +80,7 @@ jobs:
             -e "ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=accept-new" \
             -f '+ /Makefile' \
             -f '+ /docker/' \
-            -f '+ /docker/docker-compose.yml' \
-            -f '+ /docker/docker-compose.prod.yml' \
+            -f '+ /docker/compose.yml' \
             -f '+ /docker/Caddyfile' \
             -f '- *' \
             ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/www/next-krot-site/
@@ -91,15 +90,19 @@ jobs:
         run: |
           ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=accept-new \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} '\
-              docker compose --env-file "$HOME/env/next-krot-site/.env.production" \
-                -f "$HOME/www/next-krot-site/docker/docker-compose.yml" \
-                -f "$HOME/www/next-krot-site/docker/docker-compose.prod.yml" pull web && \
-              docker compose --env-file "$HOME/env/next-krot-site/.env.production" \
-                -f "$HOME/www/next-krot-site/docker/docker-compose.yml" \
-                -f "$HOME/www/next-krot-site/docker/docker-compose.prod.yml" up -d && \
-              docker compose --env-file "$HOME/env/next-krot-site/.env.production" \
-                -f "$HOME/www/next-krot-site/docker/docker-compose.yml" \
-                -f "$HOME/www/next-krot-site/docker/docker-compose.prod.yml" ps \
+              cd "$HOME/www/next-krot-site/docker" &&
+
+              docker compose \
+                --env-file "$HOME/env/next-krot-site/.env.production" \
+                pull web &&
+
+              docker compose \
+                --env-file "$HOME/env/next-krot-site/.env.production" \
+                up -d &&
+
+              docker compose \
+                --env-file "$HOME/env/next-krot-site/.env.production" \
+                ps
             '
 
       # Очистка от сборок докера

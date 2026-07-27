@@ -30,6 +30,7 @@ services:
       krot-internal:
         aliases:
           - krot-web
+      krot-egress:
 
     logging:
       driver: json-file
@@ -79,6 +80,43 @@ services:
 
     restart: unless-stopped
 
+  bot:
+    image: zarplata-subscribe-bot:latest
+    command: ["python", "main.py"]
+
+    # Укажи здесь фактический путь к переменным бота.
+    env_file:
+      - ${HOME}/env/zarplata-subscribe-bot/.env
+
+    expose:
+      - "8000"
+
+    networks:
+      caddy-public:
+        aliases:
+          - zarplata-subscribe-bot
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=3)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+    restart: unless-stopped
+
   caddy:
     image: caddy:2.10.2-alpine
 
@@ -101,6 +139,8 @@ services:
     depends_on:
       web:
         condition: service_started
+      bot:
+        condition: service_healthy
 
     networks:
       - krot-internal
@@ -123,6 +163,9 @@ volumes:
 networks:
   krot-internal:
     internal: true
+
+  krot-egress:
+    driver: bridge
 
   caddy-public:
     external: true
