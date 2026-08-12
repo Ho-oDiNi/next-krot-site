@@ -7,6 +7,7 @@ import CloseIcon from "@icons/close-black.svg";
 import { SocialLinks } from "@/shared/ui/SocialLinks";
 import { TagMap } from "@/shared/ui/TagMap";
 import { Logo } from "../../Logo";
+import { MailInfo } from "../../MailInfo/ui/MailInfo";
 
 interface BurgerMenuProps {
     onClose: () => void;
@@ -47,6 +48,7 @@ export const BurgerMenu = ({ onClose }: BurgerMenuProps) => {
                     Наши темы
                 </p>
                 <TagMap onClick={onClose} />
+                <MailInfo />
             </div>
             <SocialLinks variant="burger" />
         </div>

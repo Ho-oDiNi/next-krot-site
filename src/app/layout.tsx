@@ -14,6 +14,7 @@ import { ModalProvider, ModalRenderer } from "@/shared/lib/modal-node";
 import { AdminGate, auth } from "@/core/auth";
 import { SessionProvider } from "next-auth/react";
 import AdminRedactor from "@/widgets/admin-redactor/AdminMenu";
+import { MailInfo } from "@/shared/ui/MailInfo/ui/MailInfo";
 
 export const generateMetadata = async (): Promise<Metadata> => {
     return {
@@ -50,6 +51,8 @@ const RootLayout = async ({
                                 <div className="sticky top-44 space-y-10">
                                     <TagMap />
                                     <SocialLinks />
+
+                                    <MailInfo />
                                 </div>
                             </aside>
 

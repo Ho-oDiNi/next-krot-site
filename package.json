@@ -7,6 +7,7 @@
     "build": "dotenv -e ./config/.env.local -e ./config/.env.production -- next build",
     "start": "dotenv -e ./config/.env.local -e ./config/.env.production -- next start",
     "prisma-migrate": "dotenv -e ./config/.env.local -e ./config/.env.production -- prisma migrate dev",
+    "prisma-migrate-dev": "dotenv -e ./config/.env.local -e ./config/.env.development -- prisma migrate dev",
     "prisma-generate": "dotenv -e ./config/.env.local -e ./config/.env.production -- prisma generate",
     "lint": "eslint .",
     "test": "jest",
