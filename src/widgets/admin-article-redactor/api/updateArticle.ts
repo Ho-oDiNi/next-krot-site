@@ -1,5 +1,6 @@
 "use server";
 
+import { resolvePublicationDateForSave } from "@/entities/article/publication";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
@@ -80,50 +81,6 @@ const normalizeNullableString = (value: string | null) => {
     return trimmedValue ? trimmedValue : null;
 };
 
-/**
- * Вычисляет итоговую дату публикации `publishedAt`:
- * - при первой публикации (`isPublished: true` и `publishedAt` пустой) фиксирует текущее время `new Date()`,
- * - при редактировании уже опубликованной статьи сохраняет прежнюю дату `existingPublishedAt` (если явно не задана новая),
- * - для черновиков запрещает указывать отложенную дату в прошлом.
- */
-const resolvePublicationDateForSave = ({
-    isPublished,
-    requestedPublishedAt,
-    existingPublishedAt = null,
-    wasAlreadyPublished = false,
-}: {
-    isPublished: boolean;
-    requestedPublishedAt: Date | null;
-    existingPublishedAt?: Date | null;
-    wasAlreadyPublished?: boolean;
-}): Date | null => {
-    if (!isPublished) {
-        return requestedPublishedAt ?? existingPublishedAt ?? null;
-    }
-
-    if (!requestedPublishedAt) {
-        return existingPublishedAt ?? new Date();
-    }
-
-    const isSameAsExistingDate =
-        existingPublishedAt !== null &&
-        Math.abs(
-            requestedPublishedAt.getTime() - existingPublishedAt.getTime(),
-        ) < 60_000;
-
-    if (
-        !wasAlreadyPublished &&
-        !isSameAsExistingDate &&
-        requestedPublishedAt.getTime() < Date.now() - 60_000
-    ) {
-        throw new Error(
-            "Отложенная публикация не может быть раньше текущего времени",
-        );
-    }
-
-    return requestedPublishedAt;
-};
-
 const calculateReadingTime = (mainText: string): number =>
     Math.max(1, Math.ceil(mainText.length / READING_CHARACTERS_PER_MINUTE));
 
@@ -200,12 +157,8 @@ export const updateArticle = async (
             throw new Error("Ошибка авторизации");
         }
 
-        const {
-            originalSlug,
-            requestedPublishedAt,
-            data,
-            previewImageFile,
-        } = normalizeArticlePayload(payload);
+        const { originalSlug, requestedPublishedAt, data, previewImageFile } =
+            normalizeArticlePayload(payload);
 
         const existingArticle = originalSlug
             ? await prisma.article.findUnique({

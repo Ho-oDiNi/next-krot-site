@@ -2,18 +2,6 @@ import { prisma } from "@/shared/lib/prisma";
 import { ArticleWithRelations } from "../model";
 import { getPublishedArticleWhere } from "../lib";
 
-/**
- * Проставляет `publishedAt = createdAt` у опубликованных статей, где `publishedAt` был `null`,
- * чтобы зафиксировать дату первой публикации для старых статей в БД.
- */
-const ensurePublishedArticleDates = async () => {
-    await prisma.$executeRaw`
-        UPDATE "Article"
-        SET "publishedAt" = "createdAt"
-        WHERE "isPublished" = true AND "publishedAt" IS NULL
-    `;
-};
-
 interface GetArticlesParams {
     page: number;
     limit: number;
@@ -30,8 +18,6 @@ export const getArticles = async ({
     filters,
     isPublished,
 }: GetArticlesParams) => {
-    await ensurePublishedArticleDates();
-
     return prisma.article.findMany({
         where: {
             authorId: filters?.authorId,
@@ -56,6 +42,7 @@ export const getArticles = async ({
             { isPublished: "asc" },
             { publishedAt: "desc" },
             { createdAt: "desc" },
+            { id: "desc" },
         ],
     });
 };
@@ -64,8 +51,6 @@ export const getArticleBySlug = async (
     slug: string,
     onlyAvailable = false,
 ): Promise<ArticleWithRelations | null> => {
-    await ensurePublishedArticleDates();
-
     return prisma.article.findFirst({
         where: {
             slug,
@@ -79,8 +64,6 @@ export const getArticleBySlug = async (
 };
 
 export const getAllPublishedArticles = async () => {
-    await ensurePublishedArticleDates();
-
     return prisma.article.findMany({
         where: getPublishedArticleWhere(),
         select: {
@@ -119,8 +102,6 @@ export const getRelatedArticles = async (
     tagIds: number[],
     limit = 3,
 ): Promise<ArticleWithRelations[]> => {
-    await ensurePublishedArticleDates();
-
     const byTags =
         tagIds.length > 0
             ? await prisma.article.findMany({
