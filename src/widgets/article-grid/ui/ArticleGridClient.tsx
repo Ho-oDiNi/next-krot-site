@@ -20,11 +20,8 @@ export const ArticleGridClient = ({
     editBasePath,
     isInfiniteScrollEnabled = true,
 }: ArticleGridClientProps) => {
-    const { articles, loaderRef, isLoading, hasMore } = useInfiniteArticles(
-        initialArticles,
-        filters,
-        isPublished,
-    );
+    const { articles, loaderRef, isLoading, hasMore, error, retry } =
+        useInfiniteArticles(initialArticles, filters, isPublished);
 
     return (
         <div className="w-full space-y-6">
@@ -44,6 +41,19 @@ export const ArticleGridClient = ({
 
             {isInfiniteScrollEnabled && hasMore && (
                 <div ref={loaderRef} className="h-10" />
+            )}
+
+            {error && (
+                <div role="alert" className="space-y-2 text-center text-sm">
+                    <p>{error}</p>
+                    <button
+                        type="button"
+                        onClick={() => void retry()}
+                        disabled={isLoading}
+                    >
+                        Повторить загрузку
+                    </button>
+                </div>
             )}
 
             {isLoading && (
