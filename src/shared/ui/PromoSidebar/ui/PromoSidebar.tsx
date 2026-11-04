@@ -8,7 +8,7 @@ import Link from "next/link";
  */
 export const PromoSidebar = () => {
     return (
-        <div className="sticky top-44 space-y-6">
+        <div className="no-scrollbar sticky top-26 max-h-[calc(100dvh-6rem)] space-y-6 overflow-y-auto overscroll-contain pb-6">
             <div className="rounded-3xl bg-white p-5 shadow-xs dark:bg-gray-900">
                 <span className="inline-block rounded-full bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-500">
                     КРОТ в Telegram
@@ -26,7 +26,7 @@ export const PromoSidebar = () => {
                     rel="noopener noreferrer"
                     className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-slate-900 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-red-500 dark:bg-white dark:text-slate-900 dark:hover:bg-red-500 dark:hover:text-white"
                 >
-                    Подписаться на @krotmedia
+                    Подписаться
                 </a>
             </div>
 
